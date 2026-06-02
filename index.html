@@ -1,582 +1,1085 @@
-
-</html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Money Quest</title>
+<title>Бюджетный марафон</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #f0f4f8;
-  min-height: 100vh;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 20px;
-}
-#app {
-  width: 100%;
-  max-width: 600px;
-  background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
-  overflow: hidden;
-}
-.screen { display: none; }
-.screen.active { display: block; }
-.hdr {
-  background: #5DCAA5;
-  padding: 14px 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.hdr-title { font-size: 16px; font-weight: 600; color: #04342C; }
-.hdr-right { display: flex; gap: 8px; align-items: center; }
-.coin-badge { background: #04342C; border-radius: 16px; padding: 4px 12px; font-size: 13px; font-weight: 600; color: #9FE1CB; }
-.xp-badge   { background: #EEEDFE; border-radius: 16px; padding: 4px 10px; font-size: 12px; font-weight: 600; color: #3C3489; }
-.body { padding: 16px; }
-.bubble-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 14px; }
-.avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; border: 2px solid #ccc; }
-.speech { background: #f5f5f5; border-radius: 0 12px 12px 12px; padding: 10px 14px; font-size: 13px; color: #222; line-height: 1.6; flex: 1; }
-.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0; }
-.stat-box { background: #f5f5f5; border-radius: 8px; padding: 8px 6px; text-align: center; }
-.stat-val { font-size: 16px; font-weight: 600; color: #222; }
-.stat-lbl { font-size: 10px; color: #888; margin-top: 2px; }
-.map-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 10px 0; }
-.map-loc { background: #f9f9f9; border: 1.5px solid #e0e0e0; border-radius: 10px; padding: 10px 4px; text-align: center; cursor: pointer; transition: all 0.15s; user-select: none; }
-.map-loc:hover { border-color: #5DCAA5; background: #E1F5EE; }
-.map-loc.visited { opacity: 0.4; pointer-events: none; }
-.m-icon { font-size: 22px; }
-.m-name { font-size: 10px; color: #666; margin-top: 3px; }
-.day-track { display: flex; gap: 5px; margin: 10px 0; }
-.day-dot { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #999; }
-.day-dot.done  { background: #1D9E75; border-color: #1D9E75; color: #fff; }
-.day-dot.today { background: #FAEEDA; border-color: #EF9F27; color: #633806; font-weight: 600; }
-.card-list { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
-.card { background: #fff; border: 1.5px solid #e0e0e0; border-radius: 12px; padding: 12px 14px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: all 0.15s; user-select: none; }
-.card:hover { border-color: #5DCAA5; background: #E1F5EE; }
-.card.selected { border-color: #1D9E75; background: #EAF3DE; }
-.c-icon { font-size: 24px; flex-shrink: 0; }
-.c-body { flex: 1; }
-.c-title { font-size: 13px; font-weight: 600; color: #222; }
-.c-sub { font-size: 11px; color: #888; margin-top: 2px; }
-.c-price { font-size: 13px; font-weight: 600; color: #1D9E75; flex-shrink: 0; }
-.c-price.minus { color: #E24B4A; }
-.diff-grid, .char-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0; }
-.diff-card, .char-card { border: 1.5px solid #e0e0e0; border-radius: 12px; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.15s; user-select: none; }
-.diff-card:hover { border-color: #5DCAA5; background: #E1F5EE; }
-.char-card:hover { border-color: #7F77DD; background: #EEEDFE; }
-.diff-card.selected { border-color: #1D9E75; background: #EAF3DE; }
-.char-card.selected { border-color: #7F77DD; background: #EEEDFE; }
-.d-icon, .ch-icon { font-size: 28px; }
-.d-name, .ch-name { font-size: 13px; font-weight: 600; color: #222; margin-top: 4px; }
-.d-sub, .ch-sub { font-size: 11px; color: #888; }
-.shop-item { background: #fff; border: 1.5px solid #e0e0e0; border-radius: 10px; padding: 10px 12px; margin-bottom: 7px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.12s; user-select: none; }
-.shop-item:hover { background: #E1F5EE; border-color: #5DCAA5; }
-.shop-item.in-bag { background: #EAF3DE; border-color: #1D9E75; }
-.shop-item.cant-buy { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
-.badge { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 8px; flex-shrink: 0; }
-.badge-need { background: #E6F1FB; color: #0C447C; }
-.badge-want { background: #EEEDFE; color: #3C3489; }
-.outcome { border-radius: 12px; padding: 14px 16px; margin: 10px 0; font-size: 13px; line-height: 1.6; border: 1.5px solid; }
-.outcome.good { background: #EAF3DE; border-color: #639922; color: #27500A; }
-.outcome.bad  { background: #FCEBEB; border-color: #E24B4A; color: #791F1F; }
-.outcome.info { background: #E1F5EE; border-color: #1D9E75; color: #04342C; }
-.pb-wrap { background: #e8e8e8; border-radius: 4px; height: 8px; margin: 8px 0; }
-.pb { height: 8px; border-radius: 4px; background: #5DCAA5; transition: width 0.4s; }
-.btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1.5px solid #ddd; background: #fff; color: #333; transition: background 0.12s; user-select: none; }
-.btn:hover { background: #f5f5f5; }
-.btn.green  { background: #1D9E75; color: #fff; border-color: #1D9E75; }
-.btn.green:hover  { background: #0F6E56; }
-.btn.purple { background: #7F77DD; color: #fff; border-color: #7F77DD; }
-.btn.purple:hover { background: #534AB7; }
-.btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
-.btn-row { display: flex; gap: 8px; margin-top: 14px; justify-content: flex-end; flex-wrap: wrap; }
-.work-steps { display: flex; gap: 5px; flex-wrap: wrap; margin: 10px 0; }
-.work-step { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #999; }
-.work-step.done    { background: #5DCAA5; border-color: #5DCAA5; color: #fff; }
-.work-step.current { background: #FAEEDA; border-color: #EF9F27; color: #633806; font-weight: 600; }
-.wheel-area { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 10px 0; }
-.wheel-wrap { position: relative; width: 220px; height: 220px; }
-.wheel-pointer { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 24px; z-index: 5; pointer-events: none; }
-.shield-box { background: #E6F1FB; border: 1px solid #85B7EB; border-radius: 10px; padding: 10px 14px; margin: 10px 0; font-size: 13px; color: #0C447C; display: flex; align-items: center; gap: 10px; }
-.bag-box { background: #FAEEDA; border: 1px solid #EF9F27; border-radius: 10px; padding: 10px 12px; margin: 10px 0; font-size: 13px; color: #633806; line-height: 1.7; }
-.slbl { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.6px; margin: 10px 0 6px; }
-.final-center { text-align: center; padding: 14px 0 10px; }
-.score-ring { width: 100px; height: 100px; border-radius: 50%; border: 5px solid #5DCAA5; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto 12px; }
-.score-num { font-size: 30px; font-weight: 700; color: #222; }
-.score-max { font-size: 12px; color: #888; }
-.tip-list { list-style: none; margin: 10px 0; }
-.tip-list li { font-size: 13px; color: #222; padding: 4px 0; display: flex; gap: 8px; }
-.tip-list li::before { content: "•"; color: #1D9E75; font-weight: 700; flex-shrink: 0; }
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:12px}
+#app{width:100%;max-width:600px;background:#fff;border-radius:24px;box-shadow:0 8px 40px rgba(80,0,120,.25);overflow:hidden}
+.sc{display:none}.sc.on{display:block}
+.hdr{padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:6px}
+.hdr-t{font-size:14px;font-weight:800;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.2)}
+.hdr-r{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.pill{border-radius:20px;padding:4px 11px;font-size:12px;font-weight:700;white-space:nowrap;background:rgba(255,255,255,.25);color:#fff;border:1px solid rgba(255,255,255,.4)}
+.bd{padding:14px 15px}
+.brow{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px}
+.av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;border:2px solid rgba(0,0,0,.1)}
+.sp{border-radius:0 14px 14px 14px;padding:10px 13px;font-size:13px;line-height:1.6;flex:1;font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0}
+.sbox{border-radius:12px;padding:8px 5px;text-align:center}
+.sv{font-size:15px;font-weight:800}.sl{font-size:9px;font-weight:600;margin-top:2px;opacity:.7}
+.card{background:#fff;border:2px solid #e8e8ff;border-radius:14px;padding:11px 13px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .15s;user-select:none;margin-bottom:7px;box-shadow:0 2px 8px rgba(100,100,200,.07)}
+.card:hover{border-color:#a78bfa;background:#f5f3ff;transform:translateY(-1px)}
+.card.sel{border-color:#7c3aed;background:#ede9fe}
+.card.bad-pick{border-color:#ef4444;background:#fef2f2}
+.cg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0}
+.cc{border:2px solid #e8e8ff;border-radius:16px;padding:14px 8px;text-align:center;cursor:pointer;transition:all .14s;user-select:none;background:#f9f8ff}
+.cc:hover{border-color:#a78bfa;background:#f5f3ff;transform:translateY(-2px)}
+.cc.sel{border-color:#7c3aed;background:#ede9fe;box-shadow:0 0 0 3px #c4b5fd55}
+.dg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:9px 0}
+.dc{border:2px solid #e8e8ff;border-radius:14px;padding:10px 7px;text-align:center;cursor:pointer;transition:all .13s;user-select:none;background:#f9f8ff}
+.dc:hover{border-color:#34d399;background:#ecfdf5}
+.dc.sel{border-color:#059669;background:#d1fae5;box-shadow:0 0 0 3px #6ee7b755}
+.sh-item{background:#fff;border:2px solid #f0f0f0;border-radius:12px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:9px;cursor:pointer;transition:all .12s;user-select:none}
+.sh-item:hover{background:#f0fdf4;border-color:#86efac}
+.sh-item.chosen{background:#dcfce7;border-color:#22c55e}
+.sh-item.no-cash{opacity:.35;cursor:not-allowed;pointer-events:none}
+.out{border-radius:14px;padding:12px 14px;margin:8px 0;font-size:13px;line-height:1.6;border:2px solid;font-weight:600}
+.og{background:#dcfce7;border-color:#86efac;color:#166534}
+.ob{background:#fee2e2;border-color:#fca5a5;color:#991b1b}
+.oy{background:#fef3c7;border-color:#fcd34d;color:#92400e}
+.oi{background:#dbeafe;border-color:#93c5fd;color:#1e40af}
+.op{background:#ede9fe;border-color:#c4b5fd;color:#5b21b6}
+.hp-wrap{background:#f0f0f0;border-radius:6px;height:12px;margin:4px 0;overflow:hidden}
+.hp-bar{height:12px;border-radius:6px;transition:width .5s}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;border:2px solid transparent;transition:all .12s;user-select:none;font-family:'Nunito',sans-serif}
+.btn:hover{transform:translateY(-1px)}
+.btn.g{background:linear-gradient(135deg,#10b981,#059669);color:#fff;box-shadow:0 3px 12px rgba(16,185,129,.4)}
+.btn.p{background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;box-shadow:0 3px 12px rgba(139,92,246,.4)}
+.btn.o{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;box-shadow:0 3px 12px rgba(245,158,11,.4)}
+.btn:disabled{opacity:.4;pointer-events:none;transform:none}
+.brow2{display:flex;gap:8px;margin-top:13px;justify-content:flex-end;flex-wrap:wrap}
+.slbl{font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin:10px 0 5px;font-weight:700}
+.bank-opt{border:2px solid #e8e8ff;border-radius:14px;padding:11px 13px;cursor:pointer;margin-bottom:7px;transition:all .13s;user-select:none;background:#f9f8ff}
+.bank-opt:hover{border-color:#a78bfa;background:#f5f3ff}.bank-opt.sel{border-color:#7c3aed;background:#ede9fe}
+.pb-w{background:#f0f0f0;border-radius:6px;height:10px;margin:6px 0}
+.pb{height:10px;border-radius:6px;background:linear-gradient(90deg,#34d399,#10b981);transition:width .45s}
+.dayflow{display:flex;align-items:center;gap:4px;margin:8px 0}
+.dfs{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0}
+.dfd{width:34px;height:34px;border-radius:50%;border:2px solid #e0e0e0;display:flex;align-items:center;justify-content:center;font-size:15px}
+.dfd.done{border-color:#10b981;background:#dcfce7}
+.dfd.cur{border-color:#8b5cf6;background:#ede9fe;box-shadow:0 0 0 3px #c4b5fd55}
+.dfd.lk{opacity:.3}
+.dfl{flex:1;height:2px;background:#e0e0e0;margin-top:-17px}
+.dfl.done{background:#10b981}
+.dflbl{font-size:9px;color:#9ca3af;font-weight:700}
+.calc-disp{background:linear-gradient(135deg,#1e1b4b,#312e81);color:#a5f3fc;border-radius:14px;padding:14px 16px;font-size:24px;font-weight:800;text-align:right;margin:10px 0;letter-spacing:1px;font-family:monospace}
+.calc-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.calc-btn{background:#f3f4f6;border:2px solid #e5e7eb;border-radius:10px;padding:13px 6px;font-size:15px;font-weight:800;cursor:pointer;text-align:center;transition:all .12s;user-select:none;font-family:'Nunito',sans-serif}
+.calc-btn:hover{background:#ede9fe;border-color:#a78bfa}
+.calc-btn.op{background:#ede9fe;color:#7c3aed;border-color:#c4b5fd}
+.calc-btn.eq{background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none}
+.calc-btn.clr{background:#fee2e2;color:#ef4444;border-color:#fca5a5}
+.bslider{margin:10px 0}
+.bslider-t{display:flex;justify-content:space-between;font-size:12px;color:#374151;margin-bottom:4px;font-weight:700}
+.bslider input[type=range]{width:100%;accent-color:#8b5cf6;height:6px}
+.con-box{border:2px solid #ef4444;border-radius:14px;padding:12px 14px;margin:9px 0;background:#fef2f2;font-size:13px;color:#991b1b;animation:shk .3s;font-weight:700}
+@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.fin-ring{width:100px;height:100px;border-radius:50%;border:5px solid #10b981;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 10px;background:linear-gradient(135deg,#ecfdf5,#d1fae5)}
+.tip-ul{list-style:none;margin:8px 0}
+.tip-ul li{font-size:13px;color:#374151;padding:4px 0;display:flex;gap:7px;font-weight:600}
+.tip-ul li::before{content:"•";color:#10b981;font-weight:900;flex-shrink:0}
+.ddot{width:30px;height:30px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+.dream-big{background:linear-gradient(135deg,#fef3c7,#fde68a);border:3px solid #f59e0b;border-radius:16px;padding:14px 16px;margin:10px 0;display:flex;align-items:center;gap:12px;box-shadow:0 4px 16px rgba(245,158,11,.3)}
+.dream-big-icon{font-size:40px;flex-shrink:0}
+.dream-big-text{flex:1}
+.dream-big-title{font-size:16px;font-weight:900;color:#92400e}
+.dream-big-sub{font-size:12px;color:#b45309;margin-top:3px;font-weight:700}
+.dream-big-prog{margin-top:6px}
+.inp{width:100%;padding:10px 14px;border:2px solid #e8e8ff;border-radius:12px;font-size:15px;font-weight:700;color:#1e1b4b;outline:none;font-family:'Nunito',sans-serif}
+.inp:focus{border-color:#8b5cf6}
+.warn{background:#fef3c7;border:2px solid #fcd34d;border-radius:12px;padding:9px 12px;margin:7px 0;font-size:12px;color:#92400e;font-weight:700}
+.title-banner{background:linear-gradient(135deg,#7c3aed,#4f46e5);border-radius:16px;padding:14px 16px;margin-bottom:12px;text-align:center;color:#fff}
+.title-banner h1{font-size:15px;font-weight:900;letter-spacing:.3px}
+.hdr-intro{background:linear-gradient(135deg,#7c3aed,#4f46e5)}
+.hdr-shop{background:linear-gradient(135deg,#ec4899,#be185d)}
+.hdr-work{background:linear-gradient(135deg,#f59e0b,#d97706)}
+.hdr-bank{background:linear-gradient(135deg,#10b981,#059669)}
+.hdr-ev{background:linear-gradient(135deg,#ef4444,#dc2626)}
+.hdr-day{background:linear-gradient(135deg,#3b82f6,#2563eb)}
+.hdr-fin{background:linear-gradient(135deg,#f59e0b,#d97706)}
 </style>
 </head>
 <body>
 <div id="app">
 
 <!-- INTRO -->
-<div id="s-intro" class="screen active">
-  <div class="hdr">
-    <span class="hdr-title">&#x1F4B0; Money Quest</span>
-    <span style="font-size:11px;background:#9FE1CB;color:#04342C;padding:3px 9px;border-radius:10px;font-weight:600">v2.0</span>
+<div id="s-intro" class="sc on">
+  <div class="hdr hdr-intro">
+    <span class="hdr-t">Финансовая игра</span>
   </div>
-  <div class="body">
-    <div class="bubble-row">
-      <div class="avatar" style="background:#FAEEDA;border-color:#EF9F27">&#x1F98A;</div>
-      <div class="speech">&#x041F;&#x0440;&#x0438;&#x0432;&#x0435;&#x0442;! &#x042F; &#x0424;&#x0435;&#x043D;&#x044F;. &#x041F;&#x043E;&#x043C;&#x043E;&#x0433;&#x0438; &#x0441;&#x0432;&#x043E;&#x0435;&#x043C;&#x0443; &#x043F;&#x0435;&#x0440;&#x0441;&#x043E;&#x043D;&#x0430;&#x0436;&#x0443; &#x043F;&#x0440;&#x043E;&#x0436;&#x0438;&#x0442;&#x044C; 7 &#x0434;&#x043D;&#x0435;&#x0439; &#x0441; &#x043A;&#x0430;&#x0440;&#x043C;&#x0430;&#x043D;&#x043D;&#x044B;&#x043C;&#x0438; &#x0434;&#x0435;&#x043D;&#x044C;&#x0433;&#x0430;&#x043C;&#x0438;. &#x041C;&#x0430;&#x0433;&#x0430;&#x0437;&#x0438;&#x043D;, &#x043F;&#x043E;&#x0434;&#x0440;&#x0430;&#x0431;&#x043E;&#x0442;&#x043A;&#x0430;, &#x043A;&#x043E;&#x043B;&#x0435;&#x0441;&#x043E; &#x0443;&#x0434;&#x0430;&#x0447;&#x0438; &#x0438; &#x043D;&#x0435;&#x043E;&#x0436;&#x0438;&#x0434;&#x0430;&#x043D;&#x043D;&#x043E;&#x0441;&#x0442;&#x0438; &mdash; &#x0432;&#x0441;&#x0451; &#x043A;&#x0430;&#x043A; &#x0432; &#x0436;&#x0438;&#x0437;&#x043D;&#x0438;!</div>
+  <div class="bd">
+    <div class="title-banner">
+      <h1>«Бюджетный марафон: неделя с умом» 🏆</h1>
     </div>
-    <div class="slbl">&#x412;&#x044B;&#x0431;&#x0435;&#x0440;&#x0438; &#x043F;&#x0435;&#x0440;&#x0441;&#x043E;&#x043D;&#x0430;&#x0436;&#x0430;</div>
-    <div class="char-grid">
-      <div class="char-card" id="ch-0" onclick="pickChar(0)"><div class="ch-icon">&#x1F466;</div><div class="ch-name">&#x0421;&#x0430;&#x0448;&#x0430;</div><div class="ch-sub">&#x041C;&#x0435;&#x0447;&#x0442;&#x0430;: &#x043F;&#x0440;&#x0438;&#x0441;&#x0442;&#x0430;&#x0432;&#x043A;&#x0430;</div></div>
-      <div class="char-card" id="ch-1" onclick="pickChar(1)"><div class="ch-icon">&#x1F467;</div><div class="ch-name">&#x041C;&#x0430;&#x0448;&#x0430;</div><div class="ch-sub">&#x041C;&#x0435;&#x0447;&#x0442;&#x0430;: &#x043A;&#x043D;&#x0438;&#x0433;&#x0438;</div></div>
-      <div class="char-card" id="ch-2" onclick="pickChar(2)"><div class="ch-icon">&#x1F9D1;</div><div class="ch-name">&#x041B;&#x0451;&#x0448;&#x0430;</div><div class="ch-sub">&#x041C;&#x0435;&#x0447;&#x0442;&#x0430;: &#x0444;&#x043E;&#x0440;&#x043C;&#x0430;</div></div>
+    <div class="brow">
+      <div class="av" style="background:#fef3c7;border-color:#fbbf24">🦊</div>
+      <div class="sp" style="background:#fef3c7;color:#92400e">Привет! Я Феня. Выбери персонажа и помоги ему в течение недели распределять деньги и накопить на мечту! 🎯</div>
     </div>
-    <div class="slbl">&#x0421;&#x043B;&#x043E;&#x0436;&#x043D;&#x043E;&#x0441;&#x0442;&#x044C;</div>
-    <div class="diff-grid">
-      <div class="diff-card" id="df-0" onclick="pickDiff(0)"><div class="d-icon">&#x1F423;</div><div class="d-name">&#x041D;&#x043E;&#x0432;&#x0438;&#x0447;&#x043E;&#x043A;</div><div class="d-sub">200&#x20BD;/&#x0434;&#x0435;&#x043D;&#x044C;</div></div>
-      <div class="diff-card selected" id="df-1" onclick="pickDiff(1)"><div class="d-icon">&#x1F98A;</div><div class="d-name">&#x0421;&#x043C;&#x0435;&#x043B;&#x044B;&#x0439;</div><div class="d-sub">150&#x20BD;/&#x0434;&#x0435;&#x043D;&#x044C;</div></div>
-      <div class="diff-card" id="df-2" onclick="pickDiff(2)"><div class="d-icon">&#x1F981;</div><div class="d-name">&#x042D;&#x043A;&#x0441;&#x043F;&#x0435;&#x0440;&#x0442;</div><div class="d-sub">120&#x20BD;/&#x0434;&#x0435;&#x043D;&#x044C;</div></div>
+    <div class="slbl">👤 Выбери персонажа</div>
+    <div class="cg">
+      <div class="cc" id="ch0" onclick="pickChar(0)">
+        <div style="font-size:32px">👦</div>
+        <div style="font-size:13px;font-weight:800;color:#4c1d95;margin-top:5px">Саша</div>
+        <div style="font-size:11px;color:#7c3aed;font-weight:700">Спортсмен 🏃</div>
+      </div>
+      <div class="cc" id="ch1" onclick="pickChar(1)">
+        <div style="font-size:32px">👧</div>
+        <div style="font-size:13px;font-weight:800;color:#4c1d95;margin-top:5px">Маша</div>
+        <div style="font-size:11px;color:#7c3aed;font-weight:700">Книголюб 📚</div>
+      </div>
+      <div class="cc" id="ch2" onclick="pickChar(2)">
+        <div style="font-size:32px">🧑</div>
+        <div style="font-size:13px;font-weight:800;color:#4c1d95;margin-top:5px">Лёша</div>
+        <div style="font-size:11px;color:#7c3aed;font-weight:700">Технарь 💻</div>
+      </div>
     </div>
-    <div class="btn-row"><button class="btn green" onclick="startGame()">&#x041D;&#x0430;&#x0447;&#x0430;&#x0442;&#x044C; &#x0438;&#x0433;&#x0440;&#x0443; &rarr;</button></div>
+    <div id="char-info" style="display:none"></div>
+    <div class="slbl">⚡ Сложность</div>
+    <div class="dg">
+      <div class="dc" id="df0" onclick="pickDiff(0)"><div style="font-size:22px">🐣</div><div style="font-size:12px;font-weight:800;margin-top:3px;color:#166534">Лёгкий</div><div style="font-size:10px;color:#6b7280;font-weight:600">200 руб. в день</div></div>
+      <div class="dc sel" id="df1" onclick="pickDiff(1)"><div style="font-size:22px">🦊</div><div style="font-size:12px;font-weight:800;margin-top:3px;color:#92400e">Средний</div><div style="font-size:10px;color:#6b7280;font-weight:600">150 руб. в день</div></div>
+      <div class="dc" id="df2" onclick="pickDiff(2)"><div style="font-size:22px">🦁</div><div style="font-size:12px;font-weight:800;margin-top:3px;color:#991b1b">Сложный</div><div style="font-size:10px;color:#6b7280;font-weight:600">120 руб. в день</div></div>
+    </div>
+    <div class="brow2"><button class="btn p" onclick="startGame()">Начать игру! 🚀</button></div>
   </div>
 </div>
 
-<!-- MAP -->
-<div id="s-map" class="screen">
-  <div class="hdr">
-    <span class="hdr-title" id="map-title">&#x414;&#x0435;&#x043D;&#x044C; 1</span>
-    <div class="hdr-right">
-      <div class="coin-badge">&#x1F4B0; <span id="map-coins">0&#x20BD;</span></div>
-      <div class="xp-badge">&#x2B50; <span id="map-xp">0</span></div>
+<!-- DAY START -->
+<div id="s-ds" class="sc">
+  <div class="hdr hdr-day">
+    <span class="hdr-t" id="ds-t">День 1</span>
+    <div class="hdr-r">
+      <div class="pill">💰 <span id="ds-c">0 руб.</span></div>
+      <div class="pill" id="ds-hp-pill">❤️ 100%</div>
+      <div class="pill">⭐ <span id="ds-x">0</span></div>
     </div>
   </div>
-  <div class="body">
-    <div class="bubble-row">
-      <div class="avatar" style="background:#FAEEDA;border-color:#EF9F27">&#x1F98A;</div>
-      <div class="speech" id="map-speech">&#x412;&#x044B;&#x0431;&#x0435;&#x0440;&#x0438; &#x043A;&#x0443;&#x0434;&#x0430; &#x043F;&#x043E;&#x0439;&#x0442;&#x0438;!</div>
-    </div>
-    <div class="stats">
-      <div class="stat-box"><div class="stat-val" id="st-wallet">0&#x20BD;</div><div class="stat-lbl">&#x041A;&#x043E;&#x0448;&#x0435;&#x043B;&#x0451;&#x043A;</div></div>
-      <div class="stat-box"><div class="stat-val" id="st-piggy">0&#x20BD;</div><div class="stat-lbl">&#x041A;&#x043E;&#x043F;&#x0438;&#x043B;&#x043A;&#x0430;</div></div>
-      <div class="stat-box"><div class="stat-val" id="st-day">1</div><div class="stat-lbl">&#x414;&#x0435;&#x043D;&#x044C;</div></div>
-      <div class="stat-box"><div class="stat-val" id="st-score">0</div><div class="stat-lbl">&#x041E;&#x0447;&#x043A;&#x0438;</div></div>
-    </div>
-    <div class="slbl">&#x041A;&#x0443;&#x0434;&#x0430; &#x0438;&#x0434;&#x0451;&#x043C; &#x0441;&#x0435;&#x0433;&#x043E;&#x0434;&#x043D;&#x044F;?</div>
-    <div class="map-grid" id="map-grid"></div>
-    <div class="day-track" id="day-track"></div>
+  <div class="bd">
+    <div class="brow"><div class="av" id="ds-av" style="background:#fef3c7;border-color:#fbbf24">🦊</div><div class="sp" id="ds-sp" style="background:#fef3c7;color:#92400e"></div></div>
+    <div id="ds-con"></div>
+    <div id="ds-int"></div>
+    <div id="ds-dream"></div>
+    <div id="ds-obl"></div>
+    <div id="ds-flow"></div>
+    <div class="brow2"><button class="btn p" onclick="goShop()">Идём в магазин 🛒</button></div>
   </div>
 </div>
 
 <!-- SHOP -->
-<div id="s-shop" class="screen">
-  <div class="hdr">
-    <span class="hdr-title">&#x1F6D2; &#x041C;&#x0430;&#x0433;&#x0430;&#x0437;&#x0438;&#x043D; &laquo;&#x0412;&#x0441;&#x0451; &#x0435;&#x0441;&#x0442;&#x044C;&raquo;</span>
-    <div class="hdr-right"><div class="coin-badge">&#x1F4B0; <span id="shop-coins">0&#x20BD;</span></div></div>
+<div id="s-shop" class="sc">
+  <div class="hdr hdr-shop">
+    <span class="hdr-t">🛒 Магазин «Всё есть»</span>
+    <div class="hdr-r"><div class="pill">💰 <span id="sh-c">0 руб.</span></div><div class="pill" id="sh-hp-pill">❤️ 100%</div></div>
   </div>
-  <div class="body">
-    <div class="bubble-row">
-      <div class="avatar" style="background:#FBEAF0;border-color:#D4537E">&#x1F431;</div>
-      <div class="speech">&#x41F;&#x440;&#x438;&#x432;&#x435;&#x442;! &#x42F; &#x41C;&#x443;&#x440;&#x43A;&#x430;. &#x41D;&#x430;&#x436;&#x438;&#x43C;&#x430;&#x439; &#x43D;&#x430; &#x442;&#x43E;&#x432;&#x430;&#x440;, &#x447;&#x442;&#x43E;&#x431;&#x44B; &#x434;&#x43E;&#x431;&#x430;&#x432;&#x438;&#x442;&#x44C; &#x432; &#x43A;&#x43E;&#x440;&#x437;&#x438;&#x43D;&#x443;. &#x421;&#x43D;&#x430;&#x447;&#x430;&#x43B;&#x430; &#x43D;&#x443;&#x436;&#x43D;&#x43E;&#x435; &mdash; &#x43F;&#x43E;&#x442;&#x43E;&#x43C; &#x436;&#x435;&#x43B;&#x430;&#x43D;&#x438;&#x44F;!</div>
-    </div>
-    <div id="shop-list"></div>
-    <div class="bag-box" id="bag-box" style="display:none">
-      &#x1F6CD; &#x041A;&#x043E;&#x0440;&#x0437;&#x0438;&#x043D;&#x0430;: <span id="bag-items">&#x2014;</span><br>
-      &#x0418;&#x0442;&#x043E;&#x0433;&#x043E;: <b id="bag-total">0&#x20BD;</b> &nbsp;|&nbsp; &#x041E;&#x0441;&#x0442;&#x0430;&#x0442;&#x043E;&#x043A;: <b id="bag-left">0&#x20BD;</b>
-    </div>
-    <div class="btn-row">
-      <button class="btn" onclick="goMap()">&#x2190; &#x041D;&#x0430;&#x0437;&#x0430;&#x0434;</button>
-      <button class="btn green" onclick="doCheckout()">&#x041E;&#x043F;&#x043B;&#x0430;&#x0442;&#x0438;&#x0442;&#x044C; &#x0438; &#x0432;&#x044B;&#x0439;&#x0442;&#x0438;</button>
-    </div>
+  <div class="bd">
+    <div class="brow"><div class="av" style="background:#fce7f3;border-color:#f9a8d4">🐱</div><div class="sp" style="background:#fce7f3;color:#9d174d">Выбирай, что купить с умом!</div></div>
+    <div id="sh-list"></div>
+    <div class="out oy" id="sh-bag" style="display:none">🛍 <span id="sh-bag-e"></span> - Итого: <b id="sh-bag-t">0 руб.</b> - Остаток: <b id="sh-bag-l">0 руб.</b></div>
+    <div class="brow2"><button class="btn g" onclick="doCheckout()">Оплатить ✓</button></div>
   </div>
 </div>
 
 <!-- WORK -->
-<div id="s-work" class="screen">
-  <div class="hdr">
-    <span class="hdr-title">&#x1F4BC; &#x041F;&#x043E;&#x0434;&#x0440;&#x0430;&#x0431;&#x043E;&#x0442;&#x043A;&#x0430; &#x0443; &#x0421;&#x044B;&#x0447;&#x0430;</span>
-    <div class="hdr-right"><div class="coin-badge">&#x1F4B0; <span id="work-coins">0&#x20BD;</span></div></div>
+<div id="s-work" class="sc">
+  <div class="hdr hdr-work">
+    <span class="hdr-t">💼 Подработка у Сыча</span>
+    <div class="hdr-r"><div class="pill">💰 <span id="wk-c">0 руб.</span></div></div>
   </div>
-  <div class="body">
-    <div class="bubble-row">
-      <div class="avatar" style="background:#EEEDFE;border-color:#7F77DD">&#x1F989;</div>
-      <div class="speech" id="work-speech">&#x0415;&#x0441;&#x0442;&#x044C; &#x0437;&#x0430;&#x0434;&#x0430;&#x043D;&#x0438;&#x0435; &mdash; &#x0441;&#x043F;&#x0440;&#x0430;&#x0432;&#x0438;&#x0448;&#x044C;&#x0441;&#x044F;, &#x043F;&#x043E;&#x043B;&#x0443;&#x0447;&#x0438;&#x0448;&#x044C; &#x0434;&#x0435;&#x043D;&#x044C;&#x0433;&#x0438;!</div>
-    </div>
-    <div id="work-body"></div>
-    <div class="btn-row" id="work-btns"></div>
-  </div>
-</div>
-
-<!-- WHEEL -->
-<div id="s-wheel" class="screen">
-  <div class="hdr">
-    <span class="hdr-title">&#x1F3A1; &#x041A;&#x043E;&#x043B;&#x0435;&#x0441;&#x043E; &#x0444;&#x043E;&#x0440;&#x0442;&#x0443;&#x043D;&#x044B;</span>
-    <div class="hdr-right"><div class="coin-badge">&#x1F4B0; <span id="wheel-coins">0&#x20BD;</span></div></div>
-  </div>
-  <div class="body">
-    <div class="bubble-row">
-      <div class="avatar" style="background:#FAEEDA;border-color:#EF9F27">&#x1F98A;</div>
-      <div class="speech">&#x0420;&#x0430;&#x0437; &#x0432; &#x0434;&#x0435;&#x043D;&#x044C; &mdash; &#x043A;&#x043E;&#x043B;&#x0435;&#x0441;&#x043E; &#x0441;&#x0443;&#x0434;&#x044C;&#x0431;&#x044B;! &#x0418;&#x043C;&#x0435;&#x043D;&#x043D;&#x043E; &#x043F;&#x043E;&#x044D;&#x0442;&#x043E;&#x043C;&#x0443; &#x0432;&#x0430;&#x0436;&#x043D;&#x0430; &#x043F;&#x043E;&#x0434;&#x0443;&#x0448;&#x043A;&#x0430; &#x0431;&#x0435;&#x0437;&#x043E;&#x043F;&#x0430;&#x0441;&#x043D;&#x043E;&#x0441;&#x0442;&#x0438; &#x1F6E1;</div>
-    </div>
-    <div class="wheel-area">
-      <div class="wheel-wrap">
-        <div class="wheel-pointer">&#x25BC;</div>
-        <canvas id="wheelCanvas" width="220" height="220"></canvas>
-      </div>
-      <button class="btn purple" id="spin-btn" onclick="doSpin()">&#x1F3B0; &#x041A;&#x0440;&#x0443;&#x0442;&#x0438;&#x0442;&#x044C;!</button>
-      <div id="wheel-result"></div>
-    </div>
-    <div class="btn-row"><button class="btn" onclick="goMap()">&#x2190; &#x041D;&#x0430; &#x043A;&#x0430;&#x0440;&#x0442;&#x0443;</button></div>
-  </div>
-</div>
-
-<!-- BANK -->
-<div id="s-bank" class="screen">
-  <div class="hdr">
-    <span class="hdr-title">&#x1F3E6; &#x0411;&#x0430;&#x043D;&#x043A; &laquo;&#x041A;&#x043E;&#x043F;&#x0435;&#x0439;&#x043A;&#x0430;&raquo;</span>
-    <div class="hdr-right"><div class="coin-badge">&#x1F4B0; <span id="bank-coins">0&#x20BD;</span></div></div>
-  </div>
-  <div class="body">
-    <div class="bubble-row">
-      <div class="avatar" style="background:#EEEDFE;border-color:#7F77DD">&#x1F989;</div>
-      <div class="speech">&#x041E;&#x0442;&#x043A;&#x043B;&#x0430;&#x0434;&#x044B;&#x0432;&#x0430;&#x0439; &#x043A;&#x0430;&#x0436;&#x0434;&#x044B;&#x0439; &#x0434;&#x0435;&#x043D;&#x044C; &mdash; &#x0438; &#x043C;&#x0435;&#x0447;&#x0442;&#x0430; &#x0441;&#x0442;&#x0430;&#x043D;&#x0435;&#x0442; &#x0431;&#x043B;&#x0438;&#x0436;&#x0435;. &#x041A;&#x043E;&#x043F;&#x0438;&#x043B;&#x043A;&#x0430; &mdash; &#x044D;&#x0442;&#x043E; &#x0442;&#x0432;&#x043E;&#x044F; &#x043F;&#x043E;&#x0434;&#x0443;&#x0448;&#x043A;&#x0430; &#x0431;&#x0435;&#x0437;&#x043E;&#x043F;&#x0430;&#x0441;&#x043D;&#x043E;&#x0441;&#x0442;&#x0438;!</div>
-    </div>
-    <div class="stats" style="grid-template-columns:1fr 1fr">
-      <div class="stat-box"><div class="stat-val" id="bank-wallet">0&#x20BD;</div><div class="stat-lbl">&#x0412; &#x043A;&#x043E;&#x0448;&#x0435;&#x043B;&#x044C;&#x043A;&#x0435;</div></div>
-      <div class="stat-box"><div class="stat-val" id="bank-piggy">0&#x20BD;</div><div class="stat-lbl">&#x0412; &#x043A;&#x043E;&#x043F;&#x0438;&#x043B;&#x043A;&#x0435;</div></div>
-    </div>
-    <div style="margin:10px 0">
-      <div style="display:flex;justify-content:space-between;font-size:12px;color:#888;margin-bottom:4px">
-        <span id="bank-dream-name">&#x041C;&#x0435;&#x0447;&#x0442;&#x0430;</span>
-        <span id="bank-dream-pct">0%</span>
-      </div>
-      <div class="pb-wrap"><div class="pb" id="bank-pb" style="width:0%"></div></div>
-      <div style="font-size:11px;color:#888;text-align:right" id="bank-dream-vals">0&#x20BD; &#x0438;&#x0437; 0&#x20BD;</div>
-    </div>
-    <div class="slbl">&#x0421;&#x043A;&#x043E;&#x043B;&#x044C;&#x043A;&#x043E; &#x043E;&#x0442;&#x043B;&#x043E;&#x0436;&#x0438;&#x0442;&#x044C;?</div>
-    <div class="card-list" id="bank-opts"></div>
-    <div class="shield-box" id="shield-box" style="display:none">
-      <span style="font-size:22px">&#x1F6E1;</span>
-      <span>&#x041F;&#x043E;&#x0434;&#x0443;&#x0448;&#x043A;&#x0430; &#x0431;&#x0435;&#x0437;&#x043E;&#x043F;&#x0430;&#x0441;&#x043D;&#x043E;&#x0441;&#x0442;&#x0438;: <b id="shield-val">0&#x20BD;</b> &mdash; &#x0445;&#x0432;&#x0430;&#x0442;&#x0438;&#x0442; &#x043D;&#x0430; <b id="shield-days">0</b> &#x0434;&#x043D;&#x0435;&#x0439; &#x0435;&#x0434;&#x044B;!</span>
-    </div>
-    <div class="btn-row">
-      <button class="btn" onclick="goMap()">&#x2190; &#x041D;&#x0430;&#x0437;&#x0430;&#x0434;</button>
-      <button class="btn green" onclick="doBank()">&#x041F;&#x043E;&#x0434;&#x0442;&#x0432;&#x0435;&#x0440;&#x0434;&#x0438;&#x0442;&#x044C;</button>
-    </div>
+  <div class="bd">
+    <div class="brow"><div class="av" style="background:#ede9fe;border-color:#c4b5fd">🦉</div><div class="sp" id="wk-sp" style="background:#ede9fe;color:#5b21b6"></div></div>
+    <div id="wk-body"></div>
+    <div class="brow2" id="wk-btns"></div>
   </div>
 </div>
 
 <!-- EVENT -->
-<div id="s-event" class="screen">
-  <div class="hdr">
-    <span class="hdr-title" id="event-title">&#x26A1; &#x0421;&#x043E;&#x0431;&#x044B;&#x0442;&#x0438;&#x0435;!</span>
-    <div class="hdr-right"><div class="coin-badge">&#x1F4B0; <span id="event-coins">0&#x20BD;</span></div></div>
+<div id="s-ev" class="sc">
+  <div class="hdr hdr-ev">
+    <span class="hdr-t" id="ev-t">Событие!</span>
+    <div class="hdr-r"><div class="pill">💰 <span id="ev-c">0 руб.</span></div><div class="pill" id="ev-hp-pill">❤️ 100%</div></div>
   </div>
-  <div class="body">
-    <div class="bubble-row">
-      <div class="avatar" id="event-avatar" style="background:#FAEEDA;border-color:#EF9F27">&#x1F98A;</div>
-      <div class="speech" id="event-speech">&#x427;&#x0442;&#x043E;-&#x0442;&#x043E; &#x043F;&#x0440;&#x043E;&#x0438;&#x0437;&#x043E;&#x0448;&#x043B;&#x043E;!</div>
+  <div class="bd">
+    <div class="brow"><div class="av" id="ev-av">🦊</div><div class="sp" id="ev-sp"></div></div>
+    <div id="ev-ch"></div>
+    <div id="ev-res"></div>
+    <div class="brow2"><button class="btn p" id="ev-nx" style="display:none" onclick="afterEv()">Продолжить →</button></div>
+  </div>
+</div>
+
+<!-- BANK -->
+<div id="s-bank" class="sc">
+  <div class="hdr hdr-bank">
+    <span class="hdr-t">🏦 Банк «Копейка»</span>
+    <div class="hdr-r"><div class="pill">💰 <span id="bk-c">0 руб.</span></div><div class="pill" id="bk-hp-pill">❤️ 100%</div></div>
+  </div>
+  <div class="bd">
+    <div class="brow"><div class="av" style="background:#d1fae5;border-color:#6ee7b7">🦉</div><div class="sp" style="background:#d1fae5;color:#065f46">Вклад приносит проценты каждый день! Чем дольше держишь - тем больше зарабатываешь.</div></div>
+    <div class="stats" style="grid-template-columns:1fr 1fr">
+      <div class="sbox" style="background:#dbeafe"><div class="sv" id="bk-w" style="color:#1e40af">0 руб.</div><div class="sl" style="color:#3b82f6">Кошелёк</div></div>
+      <div class="sbox" style="background:#d1fae5"><div class="sv" id="bk-d" style="color:#065f46">0 руб.</div><div class="sl" style="color:#10b981">На вкладе</div></div>
     </div>
-    <div class="card-list" id="event-choices"></div>
-    <div id="event-result"></div>
-    <div class="btn-row"><button class="btn green" id="event-next-btn" style="display:none" onclick="afterEvent()">&#x41F;&#x440;&#x43E;&#x434;&#x43E;&#x43B;&#x436;&#x438;&#x442;&#x44C; &rarr;</button></div>
+    <div id="bk-dream2" style="margin:8px 0"></div>
+    <div style="margin:8px 0">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:#6b7280;margin-bottom:3px;font-weight:700"><span id="bk-dl">К мечте</span><span id="bk-dp">0%</span></div>
+      <div class="pb-w"><div class="pb" id="bk-pb" style="width:0%"></div></div>
+      <div style="font-size:11px;color:#9ca3af;text-align:right;font-weight:600" id="bk-dv"></div>
+    </div>
+    <div class="slbl">🏦 Тип вклада</div>
+    <div id="bk-prods"></div>
+    <div class="slbl">💰 Сколько положить?</div>
+    <div style="display:flex;gap:8px;align-items:center;margin:8px 0">
+      <input class="inp" type="number" id="bk-input" placeholder="Введи сумму (руб.)" min="0" oninput="onBkInput()">
+      <span id="bk-input-left" style="font-size:12px;color:#9ca3af;white-space:nowrap;font-weight:600"></span>
+    </div>
+    <div id="bk-prev" style="display:none;background:#d1fae5;border-radius:12px;padding:10px 13px;margin:8px 0;font-size:13px;color:#065f46;font-weight:600"></div>
+    <div class="brow2"><button class="btn g" onclick="doBank()">Подтвердить 💰</button></div>
+  </div>
+</div>
+
+<!-- GAME OVER -->
+<div id="s-over" class="sc">
+  <div class="hdr" style="background:linear-gradient(135deg,#ef4444,#dc2626)">
+    <span class="hdr-t">Игра окончена</span>
+  </div>
+  <div class="bd" style="text-align:center;padding:30px 20px">
+    <div style="font-size:64px;margin-bottom:12px">😴</div>
+    <div style="font-size:18px;font-weight:800;color:#991b1b;margin-bottom:8px" id="over-title">Нужен отдых!</div>
+    <div style="font-size:14px;color:#7f1d1d;margin-bottom:20px;line-height:1.6;font-weight:600" id="over-msg"></div>
+    <button class="btn p" onclick="resetGame()">Попробовать снова 🔄</button>
+  </div>
+</div>
+
+<!-- DAY END -->
+<div id="s-de" class="sc">
+  <div class="hdr hdr-day"><span class="hdr-t" id="de-t">Итог дня</span><div class="hdr-r"><div class="pill">💰 <span id="de-c">0 руб.</span></div></div></div>
+  <div class="bd">
+    <div class="brow"><div class="av" style="background:#fef3c7;border-color:#fbbf24">🦊</div><div class="sp" id="de-sp" style="background:#fef3c7;color:#92400e"></div></div>
+    <div id="de-body"></div>
+    <div class="brow2"><button class="btn p" id="de-nx" onclick="nextDay()">Дальше →</button></div>
   </div>
 </div>
 
 <!-- FINAL -->
-<div id="s-final" class="screen">
-  <div class="hdr"><span class="hdr-title">&#x1F3C6; &#x0418;&#x0442;&#x043E;&#x0433;&#x0438; &#x043D;&#x0435;&#x0434;&#x0435;&#x043B;&#x0438;</span></div>
-  <div class="body">
-    <div class="final-center">
-      <div class="score-ring">
-        <div class="score-num" id="final-score">0</div>
-        <div class="score-max">&#x0438;&#x0437; 100</div>
-      </div>
-      <div style="font-size:26px;margin:6px 0" id="final-stars">&#x2B50;</div>
-      <div style="font-size:16px;font-weight:600;color:#222;margin-bottom:4px" id="final-title">&#x041C;&#x043E;&#x043B;&#x043E;&#x0434;&#x0435;&#x0446;!</div>
-      <div style="font-size:13px;color:#888;margin-bottom:12px" id="final-sub"></div>
+<div id="s-fin" class="sc">
+  <div class="hdr hdr-fin"><span class="hdr-t">🏆 Итоги недели!</span></div>
+  <div class="bd">
+    <div style="text-align:center;padding:10px 0 6px">
+      <div class="fin-ring"><span style="font-size:26px;font-weight:900;color:#065f46" id="fn-sc">0</span><span style="font-size:11px;color:#6b7280;font-weight:700">из 100</span></div>
+      <div style="font-size:26px;margin:4px 0" id="fn-st">⭐</div>
+      <div style="font-size:16px;font-weight:900;color:#1e1b4b;margin-bottom:3px" id="fn-ti"></div>
+      <div style="font-size:12px;color:#6b7280;margin-bottom:10px;font-weight:600" id="fn-su"></div>
       <div class="stats">
-        <div class="stat-box"><div class="stat-val" id="fn-wallet">0&#x20BD;</div><div class="stat-lbl">&#x041A;&#x043E;&#x0448;&#x0435;&#x043B;&#x0451;&#x043A;</div></div>
-        <div class="stat-box"><div class="stat-val" id="fn-piggy">0&#x20BD;</div><div class="stat-lbl">&#x041A;&#x043E;&#x043F;&#x0438;&#x043B;&#x043A;&#x0430;</div></div>
-        <div class="stat-box"><div class="stat-val" id="fn-xp">0</div><div class="stat-lbl">&#x041E;&#x0447;&#x043A;&#x0438;</div></div>
-        <div class="stat-box"><div class="stat-val" id="fn-pct">0%</div><div class="stat-lbl">&#x041A; &#x043C;&#x0435;&#x0447;&#x0442;&#x0435;</div></div>
+        <div class="sbox" style="background:#dbeafe"><div class="sv" style="color:#1e40af" id="fn-w">0 руб.</div><div class="sl" style="color:#3b82f6">Кошелёк</div></div>
+        <div class="sbox" style="background:#d1fae5"><div class="sv" style="color:#065f46" id="fn-d">0 руб.</div><div class="sl" style="color:#10b981">Вклад</div></div>
+        <div class="sbox" style="background:#fce7f3"><div class="sv" id="fn-h" style="color:#be185d">100%</div><div class="sl" style="color:#ec4899">Здоровье</div></div>
+        <div class="sbox" style="background:#fef3c7"><div class="sv" id="fn-p" style="color:#92400e">0%</div><div class="sl" style="color:#f59e0b">К мечте</div></div>
       </div>
     </div>
-    <ul class="tip-list" id="final-tips"></ul>
-    <div class="btn-row" style="justify-content:center">
-      <button class="btn" onclick="resetGame()">&#x0418;&#x0433;&#x0440;&#x0430;&#x0442;&#x044C; &#x0441;&#x043D;&#x043E;&#x0432;&#x0430;</button>
-    </div>
+    <div id="fn-story" style="margin:8px 0"></div>
+    <div id="fn-days" style="display:flex;gap:4px;justify-content:center;margin:10px 0;flex-wrap:wrap"></div>
+    <ul class="tip-ul" id="fn-tips"></ul>
+    <div class="brow2" style="justify-content:center"><button class="btn p" onclick="resetGame()">Играть снова 🎮</button></div>
   </div>
 </div>
 
 </div>
 <script>
 var CHARS=[
-  {em:"\uD83D\uDC66",name:"\u0421\u0430\u0448\u0430",dream:"\uD83C\uDFAE \u041F\u0440\u0438\u0441\u0442\u0430\u0432\u043A\u0430",dreamCost:900},
-  {em:"\uD83D\uDC67",name:"\u041C\u0430\u0448\u0430",dream:"\uD83D\uDCDA \u041A\u043D\u0438\u0433\u0438",dreamCost:700},
-  {em:"\uD83E\uDDD1",name:"\u041B\u0451\u0448\u0430",dream:"\u26BD \u0424\u043E\u0440\u043C\u0430",dreamCost:800}
+  {em:'👦',name:'Саша',
+   desc:'Саша - спортсмен. Живет далеко от школы, поэтому в его обязательные траты входит автобус. Ходит на секцию по футболу.',
+   dream:'🎮 Игровая приставка',dreamCost:600,
+   avStyle:'background:#dbeafe;border-color:#93c5fd',
+   needs:[
+     {id:'bus',  em:'🚌',name:'Проездной',      cost:25,hpLoss:20,
+      skipMsg:'Ты не купил проездной, поэтому Саша опоздал в школу. -20 самочувствия 😓',
+      skipStory:'tardy'},
+     {id:'lunch',em:'🍱',name:'Обед',            cost:40,hpLoss:30,
+      skipMsg:'Ты не купил обед, поэтому Саша был голодным весь день. -30 самочувствия 😤',
+      skipStory:'hungry',isCritical:true},
+     {id:'sport',em:'⚽',name:'Взнос в секцию', cost:30,hpLoss:20,
+      skipMsg:'Ты не оплатил взнос, поэтому Саша пропустил тренировку по футболу. -20 самочувствия 😞',
+      skipStory:'kicked'}
+   ]},
+  {em:'👧',name:'Маша',
+   desc:'Маша - книголюб. До школы доходит пешком, но её обязательная трата каждый день - это книга.',
+   dream:'📚 Полное собрание книг',dreamCost:500,
+   avStyle:'background:#fce7f3;border-color:#f9a8d4',
+   needs:[
+     {id:'lunch',em:'🍱',name:'Обед',      cost:35,hpLoss:30,
+      skipMsg:'Ты не купил обед, поэтому у Маши болит голова. -30 самочувствия 😟',
+      skipStory:'dizzy',isCritical:true},
+     {id:'water',em:'💧',name:'Вода',      cost:10,hpLoss:30,
+      skipMsg:'Ты не купил воду, поэтому Маша страдала от жажды весь день. -30 самочувствия 😕',
+      skipStory:'thirsty',isCritical:true},
+     {id:'book', em:'📗',name:'Книга дня', cost:20,hpLoss:20,
+      skipMsg:'Ты не купил книгу, поэтому Маша весь день грустила. -20 самочувствия 📖',
+      skipStory:'sad'}
+   ]},
+  {em:'🧑',name:'Лёша',
+   desc:'Леша - технарь. Его обязательные траты это интернет и автобус до школы.',
+   dream:'💻 Ноутбук',dreamCost:700,
+   avStyle:'background:#ede9fe;border-color:#c4b5fd',
+   needs:[
+     {id:'phone',em:'📱',name:'Интернет',  cost:25,hpLoss:20,
+      skipMsg:'Ты не купил интернет, поэтому Лёша получил двойку за несданное задание. -20 самочувствия 😤',
+      skipStory:'fail'},
+     {id:'lunch',em:'🍱',name:'Обед',      cost:40,hpLoss:30,
+      skipMsg:'Ты не купил обед, поэтому Лёша был голодным и не мог думать на уроках. -30 самочувствия 😞',
+      skipStory:'hungry',isCritical:true},
+     {id:'bus',  em:'🚌',name:'Автобус',   cost:20,hpLoss:20,
+      skipMsg:'Ты не купил билет на автобус, поэтому Лёша опоздал в школу и промок под дождём. -20 самочувствия 😬',
+      skipStory:'late'}
+   ]}
 ];
-var DIFF=[{label:"\u041D\u043E\u0432\u0438\u0447\u043E\u043A",income:200},{label:"\u0421\u043C\u0435\u043B\u044B\u0439",income:150},{label:"\u042D\u043A\u0441\u043F\u0435\u0440\u0442",income:120}];
-var SHOP_ITEMS=[
-  {id:"lunch",em:"\uD83C\uDF71",name:"\u041E\u0431\u0435\u0434",sub:"\u041D\u0443\u0436\u043D\u043E \u043A\u0430\u0436\u0434\u044B\u0439 \u0434\u0435\u043D\u044C",cost:35,type:"need",pts:8},
-  {id:"bus",em:"\uD83D\uDE8C",name:"\u041F\u0440\u043E\u0435\u0437\u0434\u043D\u043E\u0439",sub:"\u041D\u0430 \u0432\u0435\u0441\u044C \u0434\u0435\u043D\u044C",cost:25,type:"need",pts:6},
-  {id:"water",em:"\uD83D\uDCA7",name:"\u0412\u043E\u0434\u0430",sub:"\u0412\u0430\u0436\u043D\u043E \u0434\u043B\u044F \u0437\u0434\u043E\u0440\u043E\u0432\u044C\u044F",cost:10,type:"need",pts:4},
-  {id:"pen",em:"\u270F\uFE0F",name:"\u0420\u0443\u0447\u043A\u0430",sub:"\u041D\u0443\u0436\u043D\u0430 \u0434\u043B\u044F \u0443\u0440\u043E\u043A\u0430",cost:15,type:"need",pts:5},
-  {id:"snack",em:"\uD83E\uDD68",name:"\u041F\u0435\u0440\u0435\u043A\u0443\u0441",sub:"\u041C\u043E\u0436\u043D\u043E \u043E\u0431\u043E\u0439\u0442\u0438\u0441\u044C",cost:18,type:"want",pts:2},
-  {id:"candy",em:"\uD83C\uDF6C",name:"\u0421\u043B\u0430\u0434\u043A\u043E\u0435",sub:"\u041F\u0440\u043E\u0441\u0442\u043E \u0445\u043E\u0447\u0435\u0442\u0441\u044F",cost:20,type:"want",pts:1},
-  {id:"comic",em:"\uD83D\uDCD6",name:"\u041A\u043E\u043C\u0438\u043A\u0441",sub:"\u0414\u043B\u044F \u0440\u0430\u0437\u0432\u043B\u0435\u0447\u0435\u043D\u0438\u044F",cost:40,type:"want",pts:2},
-  {id:"book",em:"\uD83D\uDCD7",name:"\u041A\u043D\u0438\u0433\u0430",sub:"\u041F\u043E\u043B\u0435\u0437\u043D\u043E \u0438 \u043F\u0440\u0438\u044F\u0442\u043D\u043E",cost:50,type:"want",pts:4}
+
+var DIFF=[{income:200},{income:150},{income:120}];
+
+var SHOP_WANTS=[
+  {id:'candy', em:'🍬',name:'Сладкое',     cost:20,pts:1},
+  {id:'comic', em:'📖',name:'Комикс',      cost:35,pts:2},
+  {id:'sticker',em:'🎨',name:'Наклейки',   cost:25,pts:1},
+  {id:'game',  em:'🕹',name:'Игра онлайн', cost:45,pts:1}
 ];
-var WORK_TASKS=[
-  {type:"sort",desc:"\u0420\u0430\u0437\u043B\u043E\u0436\u0438 \u043F\u0440\u0435\u0434\u043C\u0435\u0442\u044B \u043F\u043E \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F\u043C. \u041D\u0430\u0436\u0438\u043C\u0430\u0439 \u043A\u043D\u043E\u043F\u043A\u0443 \u043D\u0443\u0436\u043D\u043E\u0439 \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438 \u0434\u043B\u044F \u043A\u0430\u0436\u0434\u043E\u0433\u043E \u043F\u0440\u0435\u0434\u043C\u0435\u0442\u0430!",items:[{em:"\uD83C\uDF4E",cat:0},{em:"\uD83D\uDC55",cat:1},{em:"\uD83E\uDDF8",cat:2},{em:"\uD83C\uDF55",cat:0},{em:"\uD83D\uDC5F",cat:1},{em:"\uD83C\uDFAE",cat:2}],cats:["\u0415\u0434\u0430","\u041E\u0434\u0435\u0436\u0434\u0430","\u0418\u0433\u0440\u0443\u0448\u043A\u0438"],reward:50},
-  {type:"math",desc:"\u041F\u043E\u043A\u0443\u043F\u043A\u0430 \u0441\u0442\u043E\u0438\u0442 75\u20BD. \u041F\u043E\u043A\u0443\u043F\u0430\u0442\u0435\u043B\u044C \u0434\u0430\u043B 100\u20BD. \u0421\u043A\u043E\u043B\u044C\u043A\u043E \u043D\u0443\u0436\u043D\u043E \u0434\u0430\u0442\u044C \u0441\u0434\u0430\u0447\u0438? \u0412\u0432\u0435\u0434\u0438 \u0447\u0438\u0441\u043B\u043E.",answer:25,reward:40},
-  {type:"pick",desc:"\u0427\u0442\u043E \u0432\u044B\u0433\u043E\u0434\u043D\u0435\u0435 \u0432\u0441\u0435\u0433\u043E? \u0421\u0440\u0430\u0432\u043D\u0438 \u0446\u0435\u043D\u0443 \u0437\u0430 \u043E\u0434\u043D\u0443 \u0448\u0442\u0443\u043A\u0443 \u0438 \u0432\u044B\u0431\u0435\u0440\u0438!",opts:[{txt:"3 \u0442\u0435\u0442\u0440\u0430\u0434\u0438 \u043F\u043E 15\u20BD",total:45,perUnit:15},{txt:"5 \u0442\u0435\u0442\u0440\u0430\u0434\u0435\u0439 \u0437\u0430 55\u20BD",total:55,perUnit:11},{txt:"2 \u0442\u0435\u0442\u0440\u0430\u0434\u0438 \u043F\u043E 20\u20BD",total:40,perUnit:20}],best:1,reward:45}
-];
+
 var EVENTS=[
-  {title:"\u26A1 \u0421\u044E\u0440\u043F\u0440\u0438\u0437!",avatarEm:"\uD83E\uDD8A",avatarStyle:"background:#FAEEDA;border-color:#EF9F27",speech:"\u0423 \u043E\u0434\u043D\u043E\u043A\u043B\u0430\u0441\u0441\u043D\u0438\u043A\u0430 \u0437\u0430\u0432\u0442\u0440\u0430 \u0434\u0435\u043D\u044C \u0440\u043E\u0436\u0434\u0435\u043D\u0438\u044F! \u0427\u0442\u043E \u0434\u0435\u043B\u0430\u0435\u0448\u044C?",opts:[{em:"\uD83C\uDF81",name:"\u041A\u0443\u043F\u0438\u0442\u044C \u043F\u043E\u0434\u0430\u0440\u043E\u043A",sub:"\u221260\u20BD, \u0434\u043E\u0440\u043E\u0433\u043E",cost:60,pts:3,good:false,tip:"\u041F\u043E\u0434\u0430\u0440\u043E\u043A \u2014 \u0445\u043E\u0440\u043E\u0448\u043E, \u043D\u043E \u043E\u043D \u043D\u0435 \u043E\u0431\u044F\u0437\u0430\u043D \u0431\u044B\u0442\u044C \u0434\u043E\u0440\u043E\u0433\u0438\u043C."},{em:"\uD83D\uDC8C",name:"\u0421\u0434\u0435\u043B\u0430\u0442\u044C \u043E\u0442\u043A\u0440\u044B\u0442\u043A\u0443",sub:"\u0411\u0435\u0441\u043F\u043B\u0430\u0442\u043D\u043E, \u0442\u0435\u043F\u043B\u043E",cost:0,pts:9,good:true,tip:"\u041E\u0442\u043B\u0438\u0447\u043D\u043E! \u0412\u043D\u0438\u043C\u0430\u043D\u0438\u0435 \u0438 \u0437\u0430\u0431\u043E\u0442\u0430 \u0432\u0430\u0436\u043D\u0435\u0435 \u0446\u0435\u043D\u044B."}]},
-  {title:"\uD83C\uDF27 \u041D\u0435\u043F\u0440\u0435\u0434\u0432\u0438\u0434\u0435\u043D\u043D\u043E!",avatarEm:"\uD83E\uDD89",avatarStyle:"background:#EEEDFE;border-color:#7F77DD",speech:"\u041F\u0440\u043E\u043C\u043E\u0447\u0438\u043B \u043D\u043E\u0433\u0438 \u043F\u043E\u0434 \u0434\u043E\u0436\u0434\u0451\u043C \u2014 \u043D\u0443\u0436\u043D\u044B \u043D\u043E\u0441\u043A\u0438. \u041A\u0430\u043A \u043F\u043E\u0441\u0442\u0443\u043F\u0438\u0448\u044C?",opts:[{em:"\uD83E\uDDE6",name:"\u041A\u0443\u043F\u0438\u0442\u044C \u043E\u0434\u043D\u0443 \u043F\u0430\u0440\u0443",sub:"\u221215\u20BD, \u0442\u043E\u043B\u044C\u043A\u043E \u043D\u0443\u0436\u043D\u043E\u0435",cost:15,pts:9,good:true,tip:"\u0423\u043C\u043D\u043E! \u041F\u043E\u043A\u0443\u043F\u0430\u0439 \u0440\u043E\u0432\u043D\u043E \u0442\u043E, \u0447\u0442\u043E \u043D\u0443\u0436\u043D\u043E \u043F\u0440\u044F\u043C\u043E \u0441\u0435\u0439\u0447\u0430\u0441."},{em:"\uD83D\uDECD\uFE0F",name:"\u041A\u0443\u043F\u0438\u0442\u044C \u0441\u0440\u0430\u0437\u0443 5",sub:"\u221275\u20BD, \u0437\u0430\u0442\u043E \u0437\u0430\u043F\u0430\u0441",cost:75,pts:3,good:false,tip:"\u0417\u0430\u043F\u0430\u0441 \u2014 \u0445\u043E\u0440\u043E\u0448\u043E, \u043D\u043E \u0441\u0435\u0439\u0447\u0430\u0441 \u0434\u0435\u043D\u044C\u0433\u0438 \u043D\u0443\u0436\u043D\u044B \u043D\u0430 \u0434\u0440\u0443\u0433\u043E\u0435."}]},
-  {title:"\uD83C\uDFAE \u0410\u043A\u0446\u0438\u044F!",avatarEm:"\uD83D\uDC31",avatarStyle:"background:#FBEAF0;border-color:#D4537E",speech:"\u0410\u043A\u0446\u0438\u044F! \u0418\u0433\u0440\u0430 \u0437\u0430 80\u20BD \u0432\u043C\u0435\u0441\u0442\u043E 120\u20BD. \u041D\u043E \u0434\u0435\u043D\u044C\u0433\u0438 \u043D\u0443\u0436\u043D\u044B \u043D\u0430 \u0435\u0434\u0443\u2026",opts:[{em:"\uD83D\uDED2",name:"\u0412\u0437\u044F\u0442\u044C \u043F\u043E \u0430\u043A\u0446\u0438\u0438",sub:"\u221280\u20BD, \u0432\u044B\u0433\u043E\u0434\u043D\u043E!",cost:80,pts:2,good:false,tip:"\u0410\u043A\u0446\u0438\u044F \u0432\u044B\u0433\u043B\u044F\u0434\u0438\u0442 \u0432\u044B\u0433\u043E\u0434\u043D\u043E, \u043D\u043E \u044D\u0442\u043E \u043F\u043E\u0442\u0440\u0430\u0442\u0430 \u043D\u0430 \u0436\u0435\u043B\u0430\u043D\u0438\u0435."},{em:"\uD83D\uDEB6",name:"\u041F\u0440\u043E\u0439\u0442\u0438 \u043C\u0438\u043C\u043E",sub:"0\u20BD \u2014 \u0441\u043E\u0445\u0440\u0430\u043D\u0438\u043B",cost:0,pts:9,good:true,tip:"\u041C\u043E\u043B\u043E\u0434\u0435\u0446! \u0410\u043A\u0446\u0438\u044F \u2014 \u043B\u043E\u0432\u0443\u0448\u043A\u0430, \u043A\u043E\u0433\u0434\u0430 \u043D\u0435\u0442 \u043B\u0438\u0448\u043D\u0438\u0445 \u0434\u0435\u043D\u0435\u0433."}]}
+  {id:'gift',title:'🎂 День рождения!',avEm:'🦊',avBg:'#fef3c7',avBor:'#fbbf24',spBg:'#fef3c7',spC:'#92400e',
+   speech:'У одноклассника завтра день рождения! Что подаришь?',
+   opts:[
+     {em:'🚗',t:'Машинка (60 руб.)',          s:'Дорогой подарок',cost:60,pts:4,good:false,
+      tip:'Друг очень рад! Но у тебя теперь мало денег на нужное. Дорогой подарок не всегда лучший выбор.'},
+     {em:'🧸',t:'Плюшевая игрушка (35 руб.)', s:'Хороший подарок',cost:35,pts:9,good:true,
+      tip:'Отличный выбор! Друг доволен, и ты не потратил лишнее. Средний подарок - золотая середина!'},
+     {em:'💌',t:'Открытка своими руками',      s:'Бесплатно',      cost:0, pts:2,good:false,
+      tip:'Друг немного обиделся - ты совсем ничего не потратил. Маленький подарок лучше, чем ничего!'}
+   ]},
+  {id:'rain',title:'🌧 Промокли ноги!',avEm:'🦉',avBg:'#ede9fe',avBor:'#c4b5fd',spBg:'#ede9fe',spC:'#5b21b6',
+   speech:'Промокли ноги - нужны носки. Сколько купить?',
+   opts:[
+     {em:'🧦',t:'Одну пару (15 руб.)',    s:'Только нужное',   cost:15,pts:9,good:true,
+      tip:'Умно! Покупай ровно то, что нужно прямо сейчас.'},
+     {em:'🛍',t:'Сразу 5 пар (75 руб.)',  s:'Много «про запас»',cost:75,pts:3,good:false,
+      tip:'Запас - неплохо, но сейчас деньги нужны на обязательное.'}
+   ]},
+  {id:'sale',title:'🎮 Акция в магазине!',avEm:'🐱',avBg:'#fce7f3',avBor:'#f9a8d4',spBg:'#fce7f3',spC:'#9d174d',
+   speech:'Игра за 80 руб. вместо 120! Но денег немного...',
+   opts:[
+     {em:'🛒',t:'Взять по акции (80 руб.)',s:'Выгодно!',        cost:80,pts:2,good:false,
+      tip:'Акция - ловушка когда мало денег. Деньги ушли на желание, а не нужду!'},
+     {em:'🚶',t:'Пройти мимо',             s:'Сохранил деньги', cost:0, pts:9,good:true,
+      tip:'Молодец! Сначала убедись что на нужное хватит.'}
+   ]},
+  {id:'tooth',title:'🦷 Болит зуб!',avEm:'🦉',avBg:'#ede9fe',avBor:'#c4b5fd',spBg:'#ede9fe',spC:'#5b21b6',
+   speech:'Заболел зуб. Врач стоит 80 руб. Если не идти - станет хуже!',
+   opts:[
+     {em:'🏥',t:'Пойти к врачу (80 руб.)', s:'Здоровье важнее', cost:80,pts:9,good:true,
+      tip:'Правильно! Здоровье - нужда номер один. Для таких случаев нужна подушка безопасности.'},
+     {em:'🙈',t:'Потерпеть',               s:'Больно, но дёшево',cost:0,pts:1,hpLoss:50,good:false,
+      tip:'Откладывать лечение опасно - самочувствие упало на 50!'}
+   ]},
+  {id:'cafe',title:'🍕 Кафе с друзьями!',avEm:'🦊',avBg:'#fef3c7',avBor:'#fbbf24',spBg:'#fef3c7',spC:'#92400e',
+   speech:'Друзья зовут в кафе - 120 руб. Денег немного осталось...',
+   opts:[
+     {em:'🍕',t:'Пойти в кафе (120 руб.)',s:'Весело!',          cost:120,pts:2,good:false,
+      tip:'Весело, но сначала убедись что на нужное хватит!'},
+     {em:'🏠',t:'Позвать всех домой',      s:'Бесплатно!',       cost:0,  pts:8,good:true,
+      tip:'Отлично! Дружба не требует денег.'}
+   ]},
+  {id:'lemon',title:'🍋 Нашёл лимон!',avEm:'🦊',avBg:'#fef3c7',avBor:'#fbbf24',spBg:'#fef3c7',spC:'#92400e',
+   speech:'В магазине лимон за 15 руб.! Можно сделать лимонад и продать за 25 руб. Маленький бизнес!',
+   opts:[
+     {em:'🍋',t:'Купить лимон (15 руб.)',  s:'Сделать лимонад!', cost:15,pts:9,good:true,earn:25,
+      tip:'Ты купил лимон за 15 руб., сделал лимонад и продал за 25 руб.! Заработал 10 руб. чистой прибыли.'},
+     {em:'🤷',t:'Пройти мимо',             s:'Не интересно',     cost:0, pts:2,good:false,
+      tip:'Маленькие возможности для заработка упускать не стоит!'}
+   ]},
+  {id:'scam',title:'📱 Подозрительное сообщение!',avEm:'🦉',avBg:'#fee2e2',avBor:'#fca5a5',spBg:'#fee2e2',spC:'#991b1b',
+   speech:'Пришло сообщение: «Ваша карта заблокирована! Перейдите по ссылке для разблокировки.» Что делаешь?',
+   opts:[
+     {em:'🔗',t:'Перейти по ссылке',  s:'Разблокировать',     cost:0,pts:1,scam:true,good:false,
+      tip:'Это мошенники! Они сняли половину денег с карты. Никогда не переходи по подозрительным ссылкам!'},
+     {em:'📵',t:'Игнорировать',        s:'Лучше позвонить в банк',cost:0,pts:9,good:true,
+      tip:'Молодец! Это была мошенническая ссылка. Если сомневаешься - звони в банк напрямую!'}
+   ]}
 ];
-var WHEEL_SEGS=[
-  {label:"\u041D\u0430\u0448\u0451\u043B 30\u20BD! \uD83C\uDF89",val:30,color:"#C0DD97"},
-  {label:"\u0412\u0440\u0430\u0447: \u221240\u20BD \uD83E\uDDB7",val:-40,color:"#F09595"},
-  {label:"\u041F\u043E\u0434\u0430\u0440\u043E\u043A +20\u20BD \uD83C\uDF81",val:20,color:"#9FE1CB"},
-  {label:"\u0417\u043E\u043D\u0442 \u221225\u20BD \uD83C\uDF27",val:-25,color:"#FAC775"},
-  {label:"\u0421\u043A\u0438\u0434\u043A\u0430 +15\u20BD \uD83D\uDCF1",val:15,color:"#85B7EB"},
-  {label:"\u0428\u0442\u0440\u0430\u0444 \u221220\u20BD \uD83D\uDEAB",val:-20,color:"#F7C1C1"},
-  {label:"\u0423\u0434\u0430\u0447\u0430 +50\u20BD \uD83C\uDF40",val:50,color:"#5DCAA5"},
-  {label:"\u041F\u043E\u0442\u0435\u0440\u044F\u043B \u221230\u20BD \uD83D\uDE22",val:-30,color:"#ED93B1"}
+
+var BANK_PRODS=[
+  {id:'daily', em:'📅',name:'Ежедневный вклад',rate:0.005,rateLabel:'0.5% в день',desc:'Небольшой доход каждый день. Снять можно в любой момент.'},
+  {id:'weekly',em:'📆',name:'Недельный вклад',  rate:0.015,rateLabel:'1.5% в день',desc:'Выше доход! Деньги заморожены на 3 дня.'},
+  {id:'piggy', em:'🐷',name:'Просто копилка',   rate:0,    rateLabel:'0% - без процентов',desc:'Откладываешь и хранишь. Проценты не начисляются.'}
 ];
-var LOCS=[
-  {id:"shop",em:"\uD83D\uDED2",name:"\u041C\u0430\u0433\u0430\u0437\u0438\u043D",fn:"goShop"},
-  {id:"work",em:"\uD83D\uDCBC",name:"\u0420\u0430\u0431\u043E\u0442\u0430",fn:"goWork"},
-  {id:"wheel",em:"\uD83C\uDFA1",name:"\u0424\u043E\u0440\u0442\u0443\u043D\u0430",fn:"goWheel"},
-  {id:"bank",em:"\uD83C\uDFE6",name:"\u0411\u0430\u043D\u043A",fn:"goBank"},
-  {id:"home",em:"\uD83C\uDFE0",name:"\u0414\u043E\u043C\u043E\u0439",fn:"goHome"}
-];
-var S={};
-function freshState(){return{charIdx:0,diffIdx:1,money:0,piggy:0,xp:0,score:0,day:1,visited:[],bag:[],bankAmt:0,pendingEvent:null,workTask:null,sortStep:0,eventFired:false};}
-S=freshState();
-function show(id){var all=document.querySelectorAll(".screen");for(var i=0;i<all.length;i++)all[i].classList.remove("active");document.getElementById(id).classList.add("active");window.scrollTo(0,0);}
-function has(arr,v){return arr.indexOf(v)>=0;}
-function findIt(arr,fn){for(var i=0;i<arr.length;i++)if(fn(arr[i]))return arr[i];return null;}
-function pickChar(idx){S.charIdx=idx;for(var i=0;i<3;i++)document.getElementById("ch-"+i).classList.toggle("selected",i===idx);}
-function pickDiff(idx){S.diffIdx=idx;for(var i=0;i<3;i++)document.getElementById("df-"+i).classList.toggle("selected",i===idx);}
-function startGame(){if(!document.querySelector(".char-card.selected"))pickChar(0);S.money=DIFF[S.diffIdx].income;S.piggy=0;S.xp=0;S.score=0;S.day=1;S.visited=[];S.bag=[];S.bankAmt=0;S.eventFired=false;renderMap();show("s-map");}
-function goMap(){renderMap();show("s-map");}
-function renderMap(){
-  var ch=CHARS[S.charIdx];
-  document.getElementById("map-title").textContent="День "+S.day+" из 7";
-  document.getElementById("map-coins").textContent=S.money+"\u20BD";
-  document.getElementById("map-xp").textContent=S.xp;
-  document.getElementById("st-wallet").textContent=S.money+"\u20BD";
-  document.getElementById("st-piggy").textContent=S.piggy+"\u20BD";
-  document.getElementById("st-day").textContent=S.day;
-  document.getElementById("st-score").textContent=S.score;
-  document.getElementById("map-speech").textContent="День "+S.day+". У "+ch.name+" "+S.money+"\u20BD. Выбери куда пойти!";
-  var grid=document.getElementById("map-grid");grid.innerHTML="";
-  LOCS.forEach(function(loc){
-    var div=document.createElement("div");
-    div.className="map-loc"+(has(S.visited,loc.id)?" visited":"");
-    div.innerHTML='<div class="m-icon">'+loc.em+'</div><div class="m-name">'+loc.name+"</div>";
-    div.onclick=(function(fn){return function(){window[fn]();};})(loc.fn);
-    grid.appendChild(div);
-  });
-  var track=document.getElementById("day-track");track.innerHTML="";
-  for(var d=1;d<=7;d++){var dot=document.createElement("div");dot.className="day-dot"+(d<S.day?" done":d===S.day?" today":"");dot.textContent="Д"+d;track.appendChild(dot);}
+
+/* STATE */
+var G={};
+function fresh(){
+  return{
+    charIdx:0,diffIdx:1,
+    money:0,deposit:0,depProd:'piggy',frozen:0,
+    xp:0,score:0,day:1,hp:100,
+    bag:[],usedEvents:[],usedMinis:[],bankAmt:0,
+    dayLog:[],storyFlags:[],dayConseq:[],dayRatings:[],
+    critMissStreak:{},firstDay:true,calcTaskIdx:0,
+    _acc:false
+  };
 }
-function goShop(){if(has(S.visited,"shop")){alert("Сегодня ты уже был в магазине!");return;}S.bag=[];document.getElementById("shop-coins").textContent=S.money+"\u20BD";renderShop();show("s-shop");}
-function bagTotal(){var t=0;S.bag.forEach(function(id){var it=findIt(SHOP_ITEMS,function(x){return x.id===id;});if(it)t+=it.cost;});return t;}
+G=fresh();
+
+/* UTILS */
+function show(id){document.querySelectorAll('.sc').forEach(function(s){s.classList.remove('on')});document.getElementById(id).classList.add('on');window.scrollTo(0,0);}
+function R(n){return n+' руб.';}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function find(a,f){for(var i=0;i<a.length;i++)if(f(a[i]))return a[i];return null;}
+function has(a,v){return a.indexOf(v)>=0;}
+function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
+function hpColor(hp){return hp>60?'#10b981':hp>30?'#f59e0b':'#ef4444';}
+function hpLabel(hp){return hp>60?'Хорошо':'Устал';}
+function updateHpPills(){
+  var hp=G.hp;var c=hpColor(hp);
+  var txt='❤️ '+hp+'% '+hpLabel(hp);
+  ['ds-hp-pill','sh-hp-pill','ev-hp-pill','bk-hp-pill'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.textContent=txt;
+  });
+}
+
+/* INTRO */
+function pickChar(i){
+  G.charIdx=i;
+  document.querySelectorAll('.cc').forEach(function(c,j){c.classList.toggle('sel',j===i);});
+  var ch=CHARS[i];
+  var box=document.getElementById('char-info');box.style.display='block';
+  var income=DIFF[G.diffIdx].income;
+  var oblCost=ch.needs.reduce(function(s,n){return s+n.cost;},0);
+  var free=income-oblCost;
+  var bg=ch.avStyle.split(';')[0].replace('background:','').trim();
+  var bor=ch.avStyle.split(';')[1]?ch.avStyle.split(';')[1].replace('border-color:','').trim():'#ccc';
+  box.innerHTML='<div style="background:'+bg+';border-radius:14px;padding:12px 14px;margin:4px 0;border:2px solid '+bor+'">'+
+    '<div style="font-size:13px;font-weight:800;color:#1e1b4b;margin-bottom:8px;line-height:1.5">'+ch.desc+'</div>'+
+    '<div style="font-size:11px;font-weight:700;color:#6b7280;margin-bottom:6px">Обязательные расходы каждый день:</div>'+
+    ch.needs.map(function(n){return '<div style="font-size:12px;font-weight:700;color:#374151;padding:2px 0">'+n.em+' '+n.name+' - '+R(n.cost)+'</div>';}).join('')+
+    '<div style="margin-top:10px;padding:10px 12px;background:rgba(255,255,255,.6);border-radius:10px;border:2px solid '+bor+'">'+
+      '<div style="font-size:11px;font-weight:700;color:#6b7280;margin-bottom:4px">Мечта '+ch.em+':</div>'+
+      '<div style="font-size:18px;font-weight:900;color:#92400e">'+ch.dream+'</div>'+
+      '<div style="font-size:11px;color:#b45309;font-weight:700;margin-top:2px">Стоит '+R(ch.dreamCost)+' - именно ради этого ты играешь!</div>'+
+    '</div>'+
+    '<div style="margin-top:8px;font-size:12px;font-weight:700;color:#374151">💰 Доход: '+R(income)+' - Обязательно: '+R(oblCost)+' - Свободно: <span style="color:'+(free>=0?'#10b981':'#ef4444')+'">'+R(free)+'</span></div>'+
+    '</div>';
+}
+function pickDiff(i){
+  G.diffIdx=i;
+  document.querySelectorAll('.dc').forEach(function(c,j){c.classList.toggle('sel',j===i);});
+  if(document.querySelector('.cc.sel'))pickChar(G.charIdx);
+}
+function startGame(){
+  if(!document.querySelector('.cc.sel')){alert('Сначала выбери персонажа!');return;}
+  var ci=parseInt(document.querySelector('.cc.sel').id.replace('ch',''),10);
+  var di=parseInt(document.querySelector('.dc.sel').id.replace('df',''),10);
+  G=fresh();G.charIdx=ci;G.diffIdx=di;G.money=DIFF[di].income;
+  showDS();
+}
+
+/* DAY START */
+function showDS(){
+  var ch=CHARS[G.charIdx];
+  document.getElementById('ds-t').textContent='День '+G.day+' из 7';
+  document.getElementById('ds-c').textContent=R(G.money);
+  document.getElementById('ds-x').textContent=G.xp;
+  document.getElementById('ds-av').textContent=ch.em;
+  document.getElementById('ds-av').style.cssText=ch.avStyle;
+  updateHpPills();
+
+  // Accrue interest
+  var acc=0;
+  if(G.deposit>0&&G.depProd!=='piggy'&&!G._acc){
+    var pr=find(BANK_PRODS,function(x){return x.id===G.depProd;});
+    if(pr&&G.frozen<=0){acc=Math.floor(G.deposit*pr.rate);G.deposit+=acc;}
+    if(G.frozen>0)G.frozen--;
+    G._acc=true;
+  }
+
+  // Consequences from previous day
+  var con=document.getElementById('ds-con');
+  if(G.dayConseq.length){
+    con.innerHTML='<div class="con-box">😬 Последствия вчерашнего дня:<br>'+G.dayConseq.map(function(m){return '• '+m;}).join('<br>')+'</div>';
+    G.dayConseq=[];
+  } else con.innerHTML='';
+
+  document.getElementById('ds-int').innerHTML=acc>0?'<div class="out og" style="margin:5px 0">💹 Проценты по вкладу: +'+R(acc)+'! Вклад теперь '+R(G.deposit)+'</div>':'';
+
+  // Dream - big and prominent
+  var pct=G.deposit>=ch.dreamCost?100:Math.round(G.deposit/ch.dreamCost*100);
+  document.getElementById('ds-dream').innerHTML=
+    '<div class="dream-big">'+
+      '<div class="dream-big-icon">'+ch.dream.split(' ')[0]+'</div>'+
+      '<div class="dream-big-text">'+
+        '<div class="dream-big-title">Моя мечта: '+ch.dream+'</div>'+
+        '<div class="dream-big-sub">Накоплено: '+R(G.deposit)+' из '+R(ch.dreamCost)+'</div>'+
+        '<div class="dream-big-prog">'+
+          '<div class="pb-w" style="margin:5px 0 2px"><div class="pb" style="width:'+pct+'%"></div></div>'+
+          '<div style="font-size:11px;font-weight:700;color:#b45309">'+pct+'% к мечте!</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+
+  // Obligations - without hp hints
+  document.getElementById('ds-obl').innerHTML='<div class="out oy">'+
+    '<b>📋 Обязательные покупки '+ch.name+' сегодня:</b><br>'+
+    ch.needs.map(function(n){return n.em+' '+n.name+' - '+R(n.cost);}).join('<br>')+
+    '</div>';
+
+  // Speeches
+  var sp=['День 1! '+ch.name+' получает '+R(DIFF[G.diffIdx].income)+'. Сначала - магазин, потом работа и банк!',
+    'День '+G.day+'! Кошелёк: '+R(G.money)+'. Подумай хорошо что покупать в магазине!',
+    'День '+G.day+'! Следи за самочувствием на верхней панели.',
+    'День '+G.day+'! Вклад в банке приносит проценты каждое утро!'];
+  document.getElementById('ds-sp').textContent=sp[Math.min(G.day-1,sp.length-1)];
+
+  // Day flow
+  var df=document.getElementById('ds-flow');df.innerHTML='';
+  var row=document.createElement('div');row.className='dayflow';
+  [{em:'🛒',l:'Магазин'},{em:'💼',l:'Работа'},{em:'🏦',l:'Банк'},{em:'🏠',l:'Домой'}].forEach(function(p,i){
+    var s=document.createElement('div');s.className='dfs';
+    var d=document.createElement('div');d.className='dfd lk';d.textContent=p.em;
+    var lb=document.createElement('div');lb.className='dflbl';lb.textContent=p.l;
+    s.appendChild(d);s.appendChild(lb);row.appendChild(s);
+    if(i<3){var l=document.createElement('div');l.className='dfl';row.appendChild(l);}
+  });
+  df.appendChild(row);
+  show('s-ds');
+}
+
+/* GAME OVER */
+function checkGameOver(){
+  if(G.hp<=0){
+    var ch=CHARS[G.charIdx];
+    document.getElementById('over-title').textContent='Нужен отдых!';
+    document.getElementById('over-msg').textContent='Из-за неразумных трат '+ch.name+' нужен отдых, начни игру сначала! Не забывай покупать еду и воду каждый день.';
+    show('s-over');return true;
+  }
+  // Critical miss 2 days in a row
+  var ch=CHARS[G.charIdx];
+  var critIds=ch.needs.filter(function(n){return n.isCritical;}).map(function(n){return n.id;});
+  for(var i=0;i<critIds.length;i++){
+    if((G.critMissStreak[critIds[i]]||0)>=2){
+      document.getElementById('over-title').textContent='Нужен отдых!';
+      document.getElementById('over-msg').textContent='Из-за неразумных трат '+ch.name+' нужен отдых, начни игру сначала! Два дня без еды или воды - это опасно!';
+      show('s-over');return true;
+    }
+  }
+  return false;
+}
+
+/* SHOP */
+function goShop(){
+  G.bag=[];  // nothing pre-selected
+  document.getElementById('sh-c').textContent=R(G.money);
+  renderShop();
+  updateHpPills();
+  show('s-shop');
+}
+function bagTotal(){
+  return G.bag.reduce(function(s,id){
+    var n=find(CHARS[G.charIdx].needs,function(x){return x.id===id;});
+    var w=find(SHOP_WANTS,function(x){return x.id===id;});
+    return s+(n?n.cost:w?w.cost:0);
+  },0);
+}
+function getNeedIds(){return CHARS[G.charIdx].needs.map(function(n){return n.id;});}
 function renderShop(){
-  var list=document.getElementById("shop-list");list.innerHTML="";
+  var list=document.getElementById('sh-list');list.innerHTML='';
   var spent=bagTotal();
-  SHOP_ITEMS.forEach(function(item){
-    var inBag=has(S.bag,item.id);
-    var cantBuy=!inBag&&(S.money-spent<item.cost);
-    var div=document.createElement("div");
-    div.className="shop-item"+(inBag?" in-bag":cantBuy?" cant-buy":"");
-    div.innerHTML='<span style="font-size:22px">'+item.em+'</span><div style="flex:1"><div style="font-size:13px;font-weight:600;color:#222">'+item.name+'</div><div style="font-size:11px;color:#888">'+item.sub+'</div></div><span class="badge badge-'+item.type+'">'+(item.type==="need"?"Нужно":"Желание")+'</span><span style="font-size:13px;font-weight:600;margin-left:8px;color:'+(cantBuy?"#E24B4A":inBag?"#1D9E75":"#888")+'">'+(inBag?"✓ ":"")+item.cost+"\u20BD</span>";
-    div.onclick=(function(id){return function(){toggleBag(id);};})(item.id);
+
+  CHARS[G.charIdx].needs.forEach(function(need){
+    var inBag=has(G.bag,need.id);var cantBuy=!inBag&&(G.money-spent<need.cost);
+    var div=document.createElement('div');
+    div.className='sh-item'+(inBag?' chosen':cantBuy?' no-cash':'');
+    div.innerHTML='<span style="font-size:22px">'+need.em+'</span>'+
+      '<div style="flex:1"><div style="font-size:13px;font-weight:800;color:#1e1b4b">'+need.name+'</div></div>'+
+      '<span style="font-size:13px;font-weight:800;color:'+(inBag?'#10b981':cantBuy?'#ef4444':'#6b7280')+'">'+R(need.cost)+'</span>'+
+      (inBag?'<span style="font-size:16px">✅</span>':'');
+    div.onclick=(function(id){return function(){toggleShop(id);};})(need.id);
     list.appendChild(div);
   });
-  updateBagBox();
+
+  var sep=document.createElement('div');
+  sep.style.cssText='margin:10px 0 6px;font-size:11px;font-weight:800;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px';
+  sep.textContent='Ещё можно купить:';
+  list.appendChild(sep);
+
+  SHOP_WANTS.forEach(function(item){
+    var inBag=has(G.bag,item.id);var cantBuy=!inBag&&(G.money-spent<item.cost);
+    var div=document.createElement('div');
+    div.className='sh-item'+(inBag?' chosen':cantBuy?' no-cash':'');
+    div.innerHTML='<span style="font-size:22px">'+item.em+'</span>'+
+      '<div style="flex:1"><div style="font-size:13px;font-weight:800;color:#1e1b4b">'+item.name+'</div></div>'+
+      '<span style="font-size:13px;font-weight:800;color:'+(inBag?'#10b981':cantBuy?'#ef4444':'#6b7280')+'">'+R(item.cost)+'</span>'+
+      (inBag?'<span style="font-size:16px">✅</span>':'');
+    div.onclick=(function(id){return function(){toggleShop(id);};})(item.id);
+    list.appendChild(div);
+  });
+  updateBag();
 }
-function toggleBag(id){var item=findIt(SHOP_ITEMS,function(x){return x.id===id;});var idx=S.bag.indexOf(id);if(idx>=0){S.bag.splice(idx,1);}else{if(S.money-bagTotal()<item.cost)return;S.bag.push(id);}renderShop();}
-function updateBagBox(){var box=document.getElementById("bag-box");if(!S.bag.length){box.style.display="none";return;}var total=bagTotal();box.style.display="block";document.getElementById("bag-items").textContent=S.bag.map(function(id){return findIt(SHOP_ITEMS,function(x){return x.id===id;}).em;}).join(" ");document.getElementById("bag-total").textContent=total+"\u20BD";document.getElementById("bag-left").textContent=(S.money-total)+"\u20BD";document.getElementById("shop-coins").textContent=(S.money-total)+"\u20BD";}
-function doCheckout(){var total=bagTotal();var pts=0,needCount=0;S.bag.forEach(function(id){var it=findIt(SHOP_ITEMS,function(x){return x.id===id;});if(it){pts+=it.pts;if(it.type==="need")needCount++;}});if(needCount>=2)pts+=5;S.money-=total;S.xp+=pts;S.score+=pts;S.visited.push("shop");maybeEvent();}
-function maybeEvent(){if(!S.eventFired&&S.day>=2&&Math.random()>0.35){S.eventFired=true;var ev=EVENTS[Math.floor(Math.random()*EVENTS.length)];openEvent(ev);}else{goMap();}}
-function openEvent(ev){
-  S.pendingEvent=ev;
-  document.getElementById("event-title").textContent=ev.title;
-  document.getElementById("event-avatar").textContent=ev.avatarEm;
-  document.getElementById("event-avatar").style.cssText=ev.avatarStyle;
-  document.getElementById("event-speech").textContent=ev.speech;
-  document.getElementById("event-coins").textContent=S.money+"\u20BD";
-  document.getElementById("event-result").innerHTML="";
-  document.getElementById("event-next-btn").style.display="none";
-  var cont=document.getElementById("event-choices");cont.innerHTML="";
+function toggleShop(id){
+  var idx=G.bag.indexOf(id);
+  if(idx>=0){G.bag.splice(idx,1);}
+  else{
+    var n=find(CHARS[G.charIdx].needs,function(x){return x.id===id;});
+    var w=find(SHOP_WANTS,function(x){return x.id===id;});
+    var item=n||w;
+    if(G.money-bagTotal()<item.cost)return;
+    G.bag.push(id);
+  }
+  renderShop();
+}
+function updateBag(){
+  var box=document.getElementById('sh-bag');
+  if(!G.bag.length){box.style.display='none';return;}
+  var total=bagTotal();box.style.display='block';
+  document.getElementById('sh-bag-e').textContent=G.bag.map(function(id){
+    var n=find(CHARS[G.charIdx].needs,function(x){return x.id===id;});
+    var w=find(SHOP_WANTS,function(x){return x.id===id;});
+    return (n||w).em;
+  }).join(' ');
+  document.getElementById('sh-bag-t').textContent=R(total);
+  document.getElementById('sh-bag-l').textContent=R(G.money-total);
+  document.getElementById('sh-c').textContent=R(G.money-total);
+}
+function doCheckout(){
+  var ch=CHARS[G.charIdx];var total=bagTotal();
+  var skipped=ch.needs.filter(function(n){return !has(G.bag,n.id);});
+  var pts=G.bag.reduce(function(s,id){var w=find(SHOP_WANTS,function(x){return x.id===id;});return s+(w?w.pts:0);},0);
+  skipped.forEach(function(n){
+    G.hp=Math.max(0,G.hp-n.hpLoss);
+    G.dayConseq.push(n.skipMsg);
+    G.storyFlags.push(n.skipStory);
+    if(n.isCritical)G.critMissStreak[n.id]=(G.critMissStreak[n.id]||0)+1;
+  });
+  ch.needs.filter(function(n){return has(G.bag,n.id)&&n.isCritical;}).forEach(function(n){G.critMissStreak[n.id]=0;});
+  if(skipped.length===0)pts+=8;
+  G.money-=total;G.xp+=pts;G.score+=pts;
+  G.dayLog.push('🛒 -'+R(total)+(skipped.length?' (пропущено '+skipped.length+')':''));
+  updateHpPills();
+  if(checkGameOver())return;
+  maybeEvent();
+}
+
+/* EVENTS */
+function maybeEvent(){
+  var avail=EVENTS.filter(function(e){return !has(G.usedEvents,e.id);});
+  if(avail.length&&G.day>=1&&Math.random()>0.4){
+    var ev=avail[Math.floor(Math.random()*avail.length)];
+    G.usedEvents.push(ev.id);openEv(ev);
+  } else goWork();
+}
+function openEv(ev){
+  G._ev=ev;
+  document.getElementById('ev-t').textContent=ev.title;
+  document.getElementById('ev-av').textContent=ev.avEm;
+  document.getElementById('ev-av').style.cssText='background:'+ev.avBg+';border-color:'+ev.avBor;
+  document.getElementById('ev-sp').style.cssText='background:'+ev.spBg+';color:'+ev.spC;
+  document.getElementById('ev-sp').textContent=ev.speech;
+  document.getElementById('ev-c').textContent=R(G.money);
+  document.getElementById('ev-res').innerHTML='';
+  document.getElementById('ev-nx').style.display='none';
+  var cont=document.getElementById('ev-ch');cont.innerHTML='';
   ev.opts.forEach(function(opt,i){
-    var card=document.createElement("div");card.className="card";
-    card.innerHTML='<span class="c-icon">'+opt.em+'</span><div class="c-body"><div class="c-title">'+opt.name+'</div><div class="c-sub">'+opt.sub+'</div></div><span class="c-price'+(opt.cost>0?" minus":"")+'">'+( opt.cost>0?"\u2212"+opt.cost+"\u20BD":"Бесплатно")+"</span>";
-    card.onclick=(function(idx){return function(){resolveEvent(idx);};})(i);
+    var card=document.createElement('div');card.className='card';
+    card.innerHTML='<span style="font-size:22px">'+opt.em+'</span>'+
+      '<div style="flex:1"><div style="font-size:13px;font-weight:800;color:#1e1b4b">'+opt.t+'</div>'+
+      '<div style="font-size:11px;color:#9ca3af;font-weight:600">'+opt.s+'</div></div>'+
+      '<span style="font-size:12px;font-weight:800;'+(opt.cost>0?'color:#ef4444':'color:#10b981')+'">'+(opt.cost>0?'-'+R(opt.cost):'Бесплатно')+'</span>';
+    card.onclick=(function(idx){return function(){resolveEv(idx);};})(i);
     cont.appendChild(card);
   });
-  show("s-event");
+  updateHpPills();
+  show('s-ev');
 }
-function resolveEvent(idx){
-  var ev=S.pendingEvent;var opt=ev.opts[idx];
-  S.money=Math.max(0,S.money-opt.cost);S.xp+=opt.pts;S.score+=opt.pts;
-  document.getElementById("event-coins").textContent=S.money+"\u20BD";
-  var cards=document.getElementById("event-choices").querySelectorAll(".card");
-  for(var i=0;i<cards.length;i++){if(i===idx){cards[i].style.borderColor=opt.good?"#1D9E75":"#E24B4A";cards[i].style.background=opt.good?"#EAF3DE":"#FCEBEB";}else{cards[i].style.opacity="0.35";cards[i].style.pointerEvents="none";}}
-  document.getElementById("event-result").innerHTML='<div class="outcome '+(opt.good?"good":"bad")+'">'+(opt.good?"✅":"💡")+" "+opt.tip+"</div>";
-  document.getElementById("event-next-btn").style.display="inline-flex";
+function resolveEv(idx){
+  var ev=G._ev;var opt=ev.opts[idx];
+  G.money=Math.max(0,G.money-opt.cost);
+  if(opt.scam)G.money=Math.floor(G.money/2);
+  if(opt.hpLoss)G.hp=Math.max(0,G.hp-opt.hpLoss);
+  if(opt.earn)G.money+=opt.earn;
+  G.xp+=opt.pts;G.score+=opt.pts;
+  document.getElementById('ev-c').textContent=R(G.money);
+  updateHpPills();
+  var cards=document.getElementById('ev-ch').querySelectorAll('.card');
+  for(var i=0;i<cards.length;i++){
+    if(i===idx){cards[i].style.borderColor=opt.good?'#22c55e':'#ef4444';cards[i].style.background=opt.good?'#dcfce7':'#fef2f2';}
+    else{cards[i].style.opacity='.3';cards[i].style.pointerEvents='none';}
+  }
+  document.getElementById('ev-res').innerHTML='<div class="out '+(opt.good?'og':'ob')+'">'+(opt.good?'✅':'💡')+' '+opt.tip+'</div>';
+  document.getElementById('ev-nx').style.display='inline-flex';
+  G.dayLog.push(ev.title+': «'+opt.t+'»');
+  if(checkGameOver())document.getElementById('ev-nx').style.display='none';
 }
-function afterEvent(){goMap();}
+function afterEv(){goWork();}
+
+/* WORK */
+var MINI_TYPES=['sort','budget','calc','chain','catch'];
 function goWork(){
-  if(has(S.visited,"work")){alert("Сегодня уже поработал — приходи завтра!");return;}
-  S.workTask=WORK_TASKS[Math.floor(Math.random()*WORK_TASKS.length)];S.sortStep=0;
-  document.getElementById("work-coins").textContent=S.money+"\u20BD";
-  document.getElementById("work-speech").textContent=S.workTask.desc;
-  renderWorkTask();show("s-work");
+  var avail=MINI_TYPES.filter(function(m){return !has(G.usedMinis,m);});
+  if(!avail.length)G.usedMinis=[];
+  avail=MINI_TYPES.filter(function(m){return !has(G.usedMinis,m);});
+  var type=avail[Math.floor(Math.random()*avail.length)];
+  G.usedMinis.push(type);
+  document.getElementById('wk-c').textContent=R(G.money);
+  document.getElementById('wk-body').innerHTML='';
+  document.getElementById('wk-btns').innerHTML='';
+  if(type==='sort')startSort();
+  else if(type==='budget')startBudget();
+  else if(type==='calc')startCalc();
+  else if(type==='chain')startChain();
+  else startCatch();
+  show('s-work');
 }
-function renderWorkTask(){
-  var task=S.workTask;
-  var body=document.getElementById("work-body");var btns=document.getElementById("work-btns");
-  body.innerHTML="";btns.innerHTML="";
-  if(task.type==="sort"){
-    var steps=document.createElement("div");steps.className="work-steps";
-    task.items.forEach(function(_,i){var d=document.createElement("div");d.className="work-step"+(i<S.sortStep?" done":i===S.sortStep?" current":"");d.textContent=i+1;steps.appendChild(d);});
-    body.appendChild(steps);
-    if(S.sortStep<task.items.length){
-      var cur=task.items[S.sortStep];
-      var big=document.createElement("div");big.style.cssText="text-align:center;font-size:56px;padding:16px 0";big.textContent=cur.em;body.appendChild(big);
-      var row=document.createElement("div");row.style.cssText="display:flex;gap:8px;justify-content:center;margin:8px 0";
-      task.cats.forEach(function(cat,ci){var b=document.createElement("button");b.className="btn green";b.textContent=cat;b.onclick=(function(c){return function(){sortAnswer(c);};})(ci);row.appendChild(b);});
-      body.appendChild(row);
+
+function startSort(){
+  var items=[{em:'🍱',name:'Обед',cat:'need'},{em:'🎮',name:'Игра',cat:'want'},{em:'🚌',name:'Автобус',cat:'need'},{em:'🍬',name:'Конфеты',cat:'want'},{em:'💧',name:'Вода',cat:'need'},{em:'🧸',name:'Игрушка',cat:'want'}];
+  shuffle(items);var idx=0;var correct=0;
+  document.getElementById('wk-sp').textContent='Степан Сыч: «Разложи карточки - это ВАЖНО или ЖЕЛАНИЕ? Заработаешь до 60 руб.»';
+  function renderStep(){
+    var body=document.getElementById('wk-body');body.innerHTML='';
+    if(idx>=items.length){
+      var earned=correct*10;G.money+=earned;G.xp+=correct*5;G.score+=correct*8;
+      document.getElementById('wk-c').textContent=R(G.money);
+      G.dayLog.push('💼 Сортировка: +'+R(earned)+' ('+correct+'/'+items.length+')');
+      body.innerHTML='<div class="out '+(correct>=5?'og':correct>=3?'oi':'ob')+'">'+(correct===items.length?'🏆 Идеально!':correct>=4?'👍 Хорошо!':'📚 Попробуй ещё!')+' '+correct+' из '+items.length+' верно. Заработано: <b>'+R(earned)+'</b></div>';
+      document.getElementById('wk-btns').innerHTML='<button class="btn g" onclick="goBank()">В банк 🏦</button>';return;
     }
-  } else if(task.type==="math"){
-    var inp=document.createElement("input");inp.type="number";inp.placeholder="Введи сдачу (₽)";
-    inp.style.cssText="width:100%;padding:10px;border:1.5px solid #ddd;border-radius:8px;font-size:14px;margin:10px 0;background:#fff;color:#222;outline:none";
-    body.appendChild(inp);
-    var btn=document.createElement("button");btn.className="btn green";btn.textContent="Ответить";
+    var cur=items[idx];
+    var prog=document.createElement('div');prog.style.cssText='display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:#6b7280;margin-bottom:8px';
+    prog.textContent='Карточка '+(idx+1)+' из '+items.length;body.appendChild(prog);
+    var bigDiv=document.createElement('div');bigDiv.style.cssText='text-align:center;padding:18px;background:linear-gradient(135deg,#ede9fe,#dbeafe);border-radius:16px;margin-bottom:12px';
+    bigDiv.innerHTML='<div style="font-size:54px">'+cur.em+'</div><div style="font-size:16px;font-weight:900;color:#1e1b4b;margin-top:6px">'+cur.name+'</div>';body.appendChild(bigDiv);
+    var row=document.createElement('div');row.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:10px';
+    [{cat:'need',em:'✅',lbl:'Важно!',bg:'linear-gradient(135deg,#d1fae5,#a7f3d0)',bc:'#10b981',tc:'#065f46'},{cat:'want',em:'💜',lbl:'Желание',bg:'linear-gradient(135deg,#ede9fe,#ddd6fe)',bc:'#8b5cf6',tc:'#5b21b6'}].forEach(function(btn){
+      var b=document.createElement('div');b.style.cssText='background:'+btn.bg+';border:2px solid '+btn.bc+';border-radius:14px;padding:14px;text-align:center;cursor:pointer;font-weight:800;color:'+btn.tc;
+      b.innerHTML='<div style="font-size:24px">'+btn.em+'</div><div style="font-size:13px;margin-top:4px">'+btn.lbl+'</div>';
+      b.onclick=function(){
+        var ok=cur.cat===btn.cat;if(ok)correct++;
+        var whyMap={need:'Без этого нельзя нормально жить!',want:'Это желание - приятно, но можно обойтись.'};
+        var fb=document.createElement('div');fb.className='out '+(ok?'og':'ob');fb.style.marginTop='8px';
+        fb.innerHTML=(ok?'✅ Верно! ':'❌ Это '+(cur.cat==='need'?'важная покупка':'желание')+'! ')+whyMap[cur.cat];
+        body.appendChild(fb);row.querySelectorAll('div').forEach(function(x){x.style.pointerEvents='none';});
+        idx++;setTimeout(renderStep,1300);
+      };row.appendChild(b);
+    });body.appendChild(row);
+  }
+  renderStep();
+}
+
+function startBudget(){
+  var total=DIFF[G.diffIdx].income;
+  var slots=[{id:'food',label:'🍱 Еда',color:'#f59e0b'},{id:'trans',label:'🚌 Транспорт',color:'#3b82f6'},{id:'save',label:'🐷 Копилка',color:'#10b981'},{id:'fun',label:'🎉 Развлечения',color:'#8b5cf6'}];
+  var vals={};slots.forEach(function(s){vals[s.id]=0;});
+  document.getElementById('wk-sp').textContent='Степан Сыч: «У тебя '+R(total)+'. Раздели деньги с помощью ползунков! Заработаешь до 55 руб.»';
+  var body=document.getElementById('wk-body');
+  function render(){
+    body.innerHTML='';
+    var used=slots.reduce(function(s,sl){return s+vals[sl.id];},0);var free=total-used;
+    var fd=document.createElement('div');fd.id='bv-free';fd.style.cssText='background:linear-gradient(135deg,'+(free>=0?'#d1fae5,#a7f3d0':'#fee2e2,#fecaca')+')'  +';border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:14px;font-weight:800;color:'+(free>=0?'#065f46':'#991b1b')+';text-align:center';
+    fd.textContent='Нераспределено: '+R(free);body.appendChild(fd);
+    slots.forEach(function(sl){
+      var row=document.createElement('div');row.className='bslider';
+      row.innerHTML='<div class="bslider-t"><span>'+sl.label+'</span><span id="bv-'+sl.id+'" style="font-weight:800;color:'+sl.color+'">'+R(vals[sl.id])+'</span></div><input type="range" min="0" max="'+total+'" step="5" value="'+vals[sl.id]+'" style="accent-color:'+sl.color+'">';
+      row.querySelector('input').oninput=function(e){
+        var v=parseInt(e.target.value,10);
+        var other=slots.filter(function(x){return x.id!==sl.id;}).reduce(function(s,x){return s+vals[x.id];},0);
+        if(other+v>total)v=total-other;vals[sl.id]=v;e.target.value=v;
+        document.getElementById('bv-'+sl.id).textContent=R(v);
+        var u=slots.reduce(function(s,x){return s+vals[x.id];},0);
+        var fd2=document.getElementById('bv-free');if(fd2){fd2.textContent='Нераспределено: '+R(total-u);fd2.style.color=(total-u>=0)?'#065f46':'#991b1b';}
+      };body.appendChild(row);
+    });
+    document.getElementById('wk-btns').innerHTML='';
+    var btn=document.createElement('button');btn.className='btn g';btn.textContent='Проверить! ✓';
     btn.onclick=function(){
-      var v=parseInt(inp.value,10);
-      if(v===task.answer){S.money+=task.reward;S.xp+=15;S.score+=15;S.visited.push("work");document.getElementById("work-coins").textContent=S.money+"\u20BD";body.innerHTML='<div class="outcome good">✅ Правильно! Сдача '+task.answer+"\u20BD. Ты заработал "+task.reward+"\u20BD!</div>";btns.innerHTML='<button class="btn green" onclick="goMap()">← На карту</button>';}
-      else{inp.style.borderColor="#E24B4A";inp.value="";inp.placeholder="Неверно! Попробуй ещё раз…";setTimeout(function(){inp.style.borderColor="#ddd";inp.placeholder="Введи сдачу (₽)";},1000);}
-    };
-    btns.appendChild(btn);
-  } else if(task.type==="pick"){
-    task.opts.forEach(function(opt,i){
-      var card=document.createElement("div");card.className="card";
-      card.innerHTML='<span class="c-icon">📦</span><div class="c-body"><div class="c-title">'+opt.txt+'</div><div class="c-sub">Итого: '+opt.total+"\u20BD · "+opt.perUnit+"\u20BD за штуку</div></div>";
-      card.onclick=(function(idx){return function(){
-        if(idx===task.best){S.money+=task.reward;S.xp+=12;S.score+=12;S.visited.push("work");document.getElementById("work-coins").textContent=S.money+"\u20BD";body.innerHTML='<div class="outcome good">✅ Верно! '+task.opts[task.best].txt+" ("+task.opts[task.best].perUnit+"\u20BD/шт) — выгоднее всего. Заработал "+task.reward+"\u20BD!</div>";btns.innerHTML='<button class="btn green" onclick="goMap()">← На карту</button>';}
-        else{body.innerHTML='<div class="outcome bad">💡 Не самый выгодный вариант! Сравни цену за одну штуку. Попробуй ещё раз.</div>';setTimeout(renderWorkTask,1000);}
-      };})(i);
-      body.appendChild(card);
+      var foodOk=vals['food']>=30;var saveOk=vals['save']>=15;var good=foodOk&&saveOk;
+      var earned=good?55:Math.round(55*0.5);G.money+=earned;G.xp+=good?15:6;G.score+=good?15:5;
+      document.getElementById('wk-c').textContent=R(G.money);G.dayLog.push('💼 Бюджет: +'+R(earned));
+      body.innerHTML='<div class="out '+(good?'og':'oy')+'">'+(good?'✅ Отлично! Еда и копилка учтены.':'💡 Не забывай откладывать на мечту и покупать еду!')+' Заработано: <b>'+R(earned)+'</b></div>';
+      document.getElementById('wk-btns').innerHTML='<button class="btn g" onclick="goBank()">В банк 🏦</button>';
+    };document.getElementById('wk-btns').appendChild(btn);
+  }
+  render();
+}
+
+function startCalc(){
+  var CALC_TASKS=[
+    {a:100,b:87,op:'-',desc:'Покупки стоят 87 руб. Дал 100 руб. Сколько сдачи?'},
+    {a:150,b:63,op:'-',desc:'Обед стоит 63 руб. Дал 150 руб. Сколько сдачи?'},
+    {a:25,b:3,op:'*',desc:'Автобус стоит 25 руб. Едешь 3 дня. Сколько всего?'},
+    {a:200,b:4,op:'/',desc:'200 руб. на 4 дня. Сколько в день?'},
+    {a:120,b:45,op:'-',desc:'Купил за 45 руб. Дал 120 руб. Сдача?'}
+  ];
+  var taskIdx=G.calcTaskIdx%CALC_TASKS.length;G.calcTaskIdx++;
+  var task=CALC_TASKS[taskIdx];
+  var answer=task.op==='-'?task.a-task.b:task.op==='*'?task.a*task.b:Math.round(task.a/task.b);
+  document.getElementById('wk-sp').textContent='Степан Сыч: «'+task.desc+' Используй калькулятор! Заработаешь 40 руб.»';
+  var attempts=0;var answered=false;var disp='0';
+  var body=document.getElementById('wk-body');
+  function render(){
+    body.innerHTML='<div class="calc-disp" id="calc-d">'+disp+'</div><div class="calc-btns" id="calc-b"></div><div id="calc-hint" style="font-size:12px;font-weight:700;min-height:22px;margin-top:6px;color:#ef4444"></div>';
+    var btns=[['7','8','9','÷'],['4','5','6','×'],['1','2','3','-'],['C','0','=','+']];
+    var numStr='';
+    var grid=document.getElementById('calc-b');
+    btns.forEach(function(row){row.forEach(function(b){
+      var d=document.createElement('div');
+      d.className='calc-btn'+(/[÷×\-+]/.test(b)&&b!=='-'?' op':b==='='?' eq':b==='C'?' clr':'');
+      d.textContent=b;
+      d.onclick=function(){
+        if(answered)return;
+        if(b==='C'){numStr='';disp='0';document.getElementById('calc-d').textContent=disp;return;}
+        if(b==='='){
+          var parsed=parseFloat(disp);
+          if(Math.abs(parsed-answer)<=0.5){
+            answered=true;var earned=40;G.money+=earned;G.xp+=15;G.score+=15;
+            document.getElementById('wk-c').textContent=R(G.money);G.dayLog.push('💼 Калькулятор: +'+R(earned));
+            body.innerHTML='<div class="out og">✅ Правильно! Ответ: '+answer+'. Заработано: <b>'+R(earned)+'</b></div>';
+            document.getElementById('wk-btns').innerHTML='<button class="btn g" onclick="goBank()">В банк 🏦</button>';
+          } else {
+            attempts++;
+            var hintEl=document.getElementById('calc-hint');
+            if(attempts>=2){hintEl.innerHTML='❌ Неверно! Правильный ответ: <b>'+answer+' руб.</b> Попробуй ещё раз!';}
+            else{hintEl.textContent='❌ Неверно! Попробуй ещё раз. (Попытка '+attempts+' из 2)';}
+            numStr='';disp='0';document.getElementById('calc-d').textContent=disp;
+          }
+          return;
+        }
+        if(/\d/.test(b)){numStr+=b;disp=numStr;}
+        else if(/[÷×\-+]/.test(b)){
+          var ops={'÷':'/','×':'*'};var realOp=ops[b]||b;
+          try{var cur=eval(numStr.replace(/÷/g,'/').replace(/×/g,'*'));numStr=String(cur)+realOp;}catch(e){numStr=b;}
+          disp=numStr;
+        }
+        document.getElementById('calc-d').textContent=disp||'0';
+      };
+      grid.appendChild(d);
+    });});
+  }
+  render();
+  document.getElementById('wk-btns').innerHTML='';
+}
+
+function startChain(){
+  var steps=[
+    {q:'Ты получил деньги. Что сделаешь первым?',opts:[{t:'Часть сразу в копилку!',em:'🐷',pts:10,good:true,tip:'Правило «сначала заплати себе»!'},{t:'Куплю всё что хочу',em:'🛍',pts:2,good:false,tip:'Желания - потом, после нужного.'}]},
+    {q:'Осталось немного денег. Еда или кино?',opts:[{t:'Купить обед',em:'🍱',pts:10,good:true,tip:'Еда - нужда. Всегда покупаем сначала!'},{t:'Пойти в кино',em:'🎬',pts:2,good:false,tip:'Кино - желание. Сначала нужное.'}]},
+    {q:'В конце дня осталось 20 руб. Что делать?',opts:[{t:'В копилку!',em:'🐷',pts:10,good:true,tip:'Маленькие накопления складываются в большие!'},{t:'Куплю конфет',em:'🍬',pts:3,good:false,tip:'Можно, но лучше копить!'}]}
+  ];
+  document.getElementById('wk-sp').textContent='Степан Сыч: «3 шага - 3 решения. Каждое влияет на следующее! Заработаешь до 60 руб.»';
+  var totalPts=0;
+  function step(idx){
+    var body=document.getElementById('wk-body');body.innerHTML='';document.getElementById('wk-btns').innerHTML='';
+    if(idx>=steps.length){
+      var earned=Math.round(60*totalPts/(steps.length*10));G.money+=earned;G.xp+=totalPts;G.score+=totalPts;
+      document.getElementById('wk-c').textContent=R(G.money);G.dayLog.push('💼 Цепочка: +'+R(earned));
+      body.innerHTML='<div class="out '+(totalPts>=25?'og':totalPts>=15?'oi':'ob')+'">'+(totalPts>=25?'🏆 Отличные решения!':totalPts>=15?'👍 Неплохо!':'📚 В следующий раз лучше!')+' Заработано: <b>'+R(earned)+'</b></div>';
+      document.getElementById('wk-btns').innerHTML='<button class="btn g" onclick="goBank()">В банк 🏦</button>';return;
+    }
+    var s=steps[idx];
+    var prog=document.createElement('div');prog.style.cssText='display:flex;gap:5px;margin-bottom:10px;align-items:center';
+    for(var i=0;i<steps.length;i++){var d=document.createElement('div');d.style.cssText='width:28px;height:28px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;'+(i<idx?'background:#d1fae5;border-color:#10b981;color:#065f46':i===idx?'background:#ede9fe;border-color:#8b5cf6;color:#5b21b6':'background:#f3f4f6;border-color:#e5e7eb;color:#9ca3af');d.textContent=i<idx?'✓':i+1;prog.appendChild(d);if(i<steps.length-1){var l=document.createElement('div');l.style.cssText='flex:1;height:2px;background:'+(i<idx?'#10b981':'#e5e7eb');prog.appendChild(l);}}
+    body.appendChild(prog);
+    var qd=document.createElement('div');qd.style.cssText='font-size:14px;font-weight:800;color:#1e1b4b;margin:10px 0 8px;line-height:1.5';qd.textContent='Шаг '+(idx+1)+': '+s.q;body.appendChild(qd);
+    s.opts.forEach(function(opt){
+      var card=document.createElement('div');card.className='card';
+      card.innerHTML='<span style="font-size:24px">'+opt.em+'</span><div style="flex:1"><div style="font-size:13px;font-weight:800;color:#1e1b4b">'+opt.t+'</div></div>';
+      card.onclick=function(){
+        totalPts+=opt.pts;card.style.borderColor=opt.good?'#22c55e':'#ef4444';card.style.background=opt.good?'#dcfce7':'#fef2f2';
+        var fb=document.createElement('div');fb.className='out '+(opt.good?'og':'ob');fb.style.marginTop='8px';fb.textContent=(opt.good?'✅ ':'💡 ')+opt.tip;
+        body.appendChild(fb);body.querySelectorAll('.card').forEach(function(c){c.style.pointerEvents='none';});
+        var nb=document.createElement('button');nb.className='btn p';nb.textContent=idx+1<steps.length?'Следующий шаг →':'Завершить ✓';nb.onclick=function(){step(idx+1);};
+        document.getElementById('wk-btns').appendChild(nb);
+      };body.appendChild(card);
     });
   }
+  step(0);
 }
-function sortAnswer(catIdx){
-  var task=S.workTask;var cur=task.items[S.sortStep];
-  if(catIdx===cur.cat){
-    S.sortStep++;
-    if(S.sortStep>=task.items.length){S.money+=task.reward;S.xp+=15;S.score+=15;S.visited.push("work");document.getElementById("work-coins").textContent=S.money+"\u20BD";document.getElementById("work-body").innerHTML='<div class="outcome good">🎉 Отлично! Все предметы разложены. Ты заработал '+task.reward+"\u20BD!</div>";document.getElementById("work-btns").innerHTML='<button class="btn green" onclick="goMap()">← На карту</button>';}
-    else renderWorkTask();
-  } else {
-    var flash=document.createElement("div");flash.className="outcome bad";flash.textContent="❌ Неверная категория! Попробуй ещё раз.";
-    var body=document.getElementById("work-body");body.insertBefore(flash,body.firstChild);
-    setTimeout(function(){if(flash.parentNode)flash.parentNode.removeChild(flash);},800);
+
+function startCatch(){
+  document.getElementById('wk-sp').textContent='Степан Сыч: «Лови монеты и уворачивайся от лишних трат! Управляй корзинкой мышкой или пальцем. Заработаешь до 70 руб.!»';
+  var body=document.getElementById('wk-body');body.innerHTML='';document.getElementById('wk-btns').innerHTML='';
+  var canvas=document.createElement('canvas');canvas.width=360;canvas.height=220;
+  canvas.style.cssText='width:100%;height:auto;border-radius:14px;background:linear-gradient(180deg,#dbeafe 0%,#ede9fe 100%);display:block;touch-action:none';
+  body.appendChild(canvas);
+  var scoreDiv=document.createElement('div');scoreDiv.style.cssText='text-align:center;font-size:14px;font-weight:800;color:#5b21b6;margin:6px 0';scoreDiv.id='catch-sc';scoreDiv.textContent='Монеты: 0';body.appendChild(scoreDiv);
+  var ctx=canvas.getContext('2d');var W=360,H=220,bw=50,bh=28,bx=W/2-bw/2,by=H-38;
+  var items=[];var coins=0;var frames=0;var running=true;
+  var ITYPE=[{em:'💰',good:true,val:3},{em:'🪙',good:true,val:1},{em:'🍔',good:false},{em:'🕹',good:false}];
+  function spawn(){var t=ITYPE[Math.floor(Math.random()*ITYPE.length)];items.push({x:Math.random()*(W-30)+10,y:-30,vy:2+Math.random()*2,type:t});}
+  function mv(cx){var r=canvas.getBoundingClientRect();bx=clamp((cx-r.left)*(W/r.width)-bw/2,0,W-bw);}
+  canvas.onmousemove=function(e){mv(e.clientX);};
+  canvas.ontouchmove=function(e){e.preventDefault();mv(e.touches[0].clientX);};
+  function loop(){
+    if(!running)return;frames++;if(frames%40===0)spawn();
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#7c3aed';ctx.beginPath();if(ctx.roundRect)ctx.roundRect(bx,by,bw,bh,8);else ctx.rect(bx,by,bw,bh);ctx.fill();
+    ctx.font='18px serif';ctx.textAlign='center';ctx.fillText('🧺',bx+bw/2,by+22);
+    items=items.filter(function(it){
+      it.y+=it.vy;ctx.font='24px serif';ctx.textAlign='center';ctx.fillText(it.type.em,it.x,it.y);
+      if(it.y>by&&it.y<by+bh&&it.x>bx&&it.x<bx+bw){if(it.type.good)coins+=it.type.val||1;else coins=Math.max(0,coins-1);return false;}
+      return it.y<H+30;
+    });
+    scoreDiv.textContent='Монеты: '+coins;
+    if(frames<300)requestAnimationFrame(loop);else finish();
   }
-}
-var wheelAngle=0,wheelSpinning=false;
-function drawWheel(angle){
-  var canvas=document.getElementById("wheelCanvas");if(!canvas)return;
-  var ctx=canvas.getContext("2d");var cx=110,cy=110,r=104,n=WHEEL_SEGS.length,slice=2*Math.PI/n;
-  ctx.clearRect(0,0,220,220);
-  WHEEL_SEGS.forEach(function(seg,i){
-    var start=angle+i*slice,end=start+slice;
-    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,start,end);ctx.closePath();ctx.fillStyle=seg.color;ctx.fill();ctx.strokeStyle="#fff";ctx.lineWidth=2;ctx.stroke();
-    ctx.save();ctx.translate(cx,cy);ctx.rotate(start+slice/2);ctx.textAlign="right";ctx.font="600 10px -apple-system,sans-serif";ctx.fillStyle="#333";ctx.fillText(seg.label,r-6,4);ctx.restore();
-  });
-  ctx.beginPath();ctx.arc(cx,cy,14,0,2*Math.PI);ctx.fillStyle="#fff";ctx.fill();ctx.strokeStyle="#5DCAA5";ctx.lineWidth=3;ctx.stroke();
-}
-function goWheel(){if(has(S.visited,"wheel")){alert("Сегодня уже крутил — приходи завтра!");return;}document.getElementById("wheel-coins").textContent=S.money+"\u20BD";document.getElementById("wheel-result").innerHTML="";var btn=document.getElementById("spin-btn");btn.disabled=false;btn.textContent="🎰 Крутить!";drawWheel(wheelAngle);show("s-wheel");}
-function doSpin(){
-  if(wheelSpinning)return;wheelSpinning=true;document.getElementById("spin-btn").disabled=true;
-  var n=WHEEL_SEGS.length,slice=2*Math.PI/n;
-  var targetSeg=Math.floor(Math.random()*n);
-  var extraRot=(8+Math.random()*5)*2*Math.PI;
-  var segCentre=targetSeg*slice+slice/2;
-  var norm=((wheelAngle%(2*Math.PI))+2*Math.PI)%(2*Math.PI);
-  var needed=(2*Math.PI-segCentre-Math.PI/2+2*Math.PI)%(2*Math.PI);
-  var delta=((needed-norm)+2*Math.PI)%(2*Math.PI);
-  var targetAngle=wheelAngle+extraRot+delta;
-  var startAngle=wheelAngle,duration=4200,startTime=null;
-  function step(ts){
-    if(!startTime)startTime=ts;
-    var t=Math.min((ts-startTime)/duration,1);
-    var ease=1-Math.pow(1-t,4);
-    wheelAngle=startAngle+(targetAngle-startAngle)*ease;
-    drawWheel(wheelAngle);
-    if(t<1){requestAnimationFrame(step);}else{wheelSpinning=false;wheelAngle=targetAngle;finishSpin(targetSeg);}
+  function finish(){
+    running=false;var earned=Math.min(70,coins*5);G.money+=earned;G.xp+=coins*3;G.score+=earned;
+    document.getElementById('wk-c').textContent=R(G.money);G.dayLog.push('💼 Игра: +'+R(earned)+' (монеты:'+coins+')');
+    body.innerHTML='<div class="out '+(coins>=8?'og':coins>=4?'oi':'ob')+'">'+(coins>=8?'🏆 Отлично!':coins>=4?'👍 Неплохо!':'📚 Тренируйся!')+' Поймал монет: '+coins+'. Заработано: <b>'+R(earned)+'</b></div>';
+    document.getElementById('wk-btns').innerHTML='<button class="btn g" onclick="goBank()">В банк 🏦</button>';
   }
-  requestAnimationFrame(step);
+  setTimeout(function(){requestAnimationFrame(loop);},300);
+  setTimeout(function(){if(running){running=false;finish();}},10500);
 }
-function finishSpin(segIdx){
-  var seg=WHEEL_SEGS[segIdx],good=seg.val>0;
-  S.money=Math.max(0,S.money+seg.val);
-  if(good){S.xp+=5;S.score+=3;}
-  S.visited.push("wheel");
-  document.getElementById("wheel-coins").textContent=S.money+"\u20BD";
-  document.getElementById("wheel-result").innerHTML='<div class="outcome '+(good?"good":"bad")+'" style="text-align:center;margin-top:10px"><b>'+seg.label+"</b><br><span style=\"font-size:12px\">"+(good?"Повезло! Неожиданный доход.":"Вот зачем нужна подушка безопасности 🛡")+"</span></div>";
-}
+
+/* BANK */
 function goBank(){
-  var ch=CHARS[S.charIdx],pct=S.piggy>=ch.dreamCost?100:Math.round(S.piggy/ch.dreamCost*100);
-  document.getElementById("bank-coins").textContent=S.money+"\u20BD";
-  document.getElementById("bank-wallet").textContent=S.money+"\u20BD";
-  document.getElementById("bank-piggy").textContent=S.piggy+"\u20BD";
-  document.getElementById("bank-dream-name").textContent=ch.dream;
-  document.getElementById("bank-dream-pct").textContent=pct+"%";
-  document.getElementById("bank-pb").style.width=pct+"%";
-  document.getElementById("bank-dream-vals").textContent=S.piggy+"\u20BD из "+ch.dreamCost+"\u20BD";
-  document.getElementById("shield-box").style.display="none";
-  S.bankAmt=0;
-  var opts=document.getElementById("bank-opts");opts.innerHTML="";
-  var choices=[{icon:"🤷",label:"Ничего",val:0},{icon:"🌱",label:"10% — чуть",val:Math.round(S.money*0.10)},{icon:"🐷",label:"25% — хорошо",val:Math.round(S.money*0.25)},{icon:"💎",label:"50% — отлично",val:Math.round(S.money*0.50)}];
-  choices.forEach(function(ch){
-    var card=document.createElement("div");card.className="card";
-    card.innerHTML='<span class="c-icon">'+ch.icon+'</span><div class="c-body"><div class="c-title">'+ch.label+'</div><div class="c-sub">'+(ch.val>0?ch.val+"\u20BD в копилку":"Не откладывать")+"</div></div>";
-    card.onclick=(function(val,el){return function(){
-      opts.querySelectorAll(".card").forEach(function(c){c.classList.remove("selected");});el.classList.add("selected");S.bankAmt=val;
-      var total=S.piggy+val,sh=document.getElementById("shield-box");
-      if(total>0){sh.style.display="flex";document.getElementById("shield-val").textContent=total+"\u20BD";document.getElementById("shield-days").textContent=Math.max(1,Math.round(total/35));}else sh.style.display="none";
-    };})(ch.val,card);
-    opts.appendChild(card);
+  var ch=CHARS[G.charIdx];var pct=G.deposit>=ch.dreamCost?100:Math.round(G.deposit/ch.dreamCost*100);
+  document.getElementById('bk-c').textContent=R(G.money);
+  document.getElementById('bk-w').textContent=R(G.money);
+  document.getElementById('bk-d').textContent=R(G.deposit);
+  document.getElementById('bk-dl').textContent=ch.dream;
+  document.getElementById('bk-dp').textContent=pct+'%';
+  document.getElementById('bk-pb').style.width=pct+'%';
+  document.getElementById('bk-dv').textContent=R(G.deposit)+' из '+R(ch.dreamCost);
+  document.getElementById('bk-dream2').innerHTML=
+    '<div class="dream-big">'+
+      '<div class="dream-big-icon">'+ch.dream.split(' ')[0]+'</div>'+
+      '<div class="dream-big-text">'+
+        '<div class="dream-big-title">'+ch.dream+'</div>'+
+        '<div class="dream-big-sub">Копим ради этого! '+pct+'% готово.</div>'+
+      '</div>'+
+    '</div>';
+  G.bankAmt=0;
+  var prods=document.getElementById('bk-prods');prods.innerHTML='';
+  BANK_PRODS.forEach(function(p){
+    var sel=G.depProd===p.id;
+    var div=document.createElement('div');div.className='bank-opt'+(sel?' sel':'');
+    div.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;font-weight:800;color:#1e1b4b">'+p.em+' '+p.name+'</span>'+
+      '<span style="font-size:11px;background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:8px;font-weight:800">'+p.rateLabel+'</span></div>'+
+      '<div style="font-size:11px;color:#6b7280;margin-top:3px;font-weight:600">'+p.desc+'</div>';
+    div.onclick=(function(id,el){return function(){G.depProd=id;document.querySelectorAll('.bank-opt').forEach(function(x){x.classList.remove('sel');});el.classList.add('sel');updateBkPrev();};})(p.id,div);
+    prods.appendChild(div);
   });
-  show("s-bank");
+  var inp=document.getElementById('bk-input');inp.value='';inp.max=G.money;
+  document.getElementById('bk-input-left').textContent='Макс: '+R(G.money);
+  document.getElementById('bk-prev').style.display='none';
+  updateHpPills();
+  show('s-bank');
 }
-function doBank(){if(S.bankAmt>0){S.piggy+=S.bankAmt;S.money=Math.max(0,S.money-S.bankAmt);if(S.bankAmt>=Math.round((S.money+S.bankAmt)*0.25)){S.xp+=8;S.score+=8;}}goMap();}
-function goHome(){S.day++;if(S.day>7){showFinal();return;}S.money+=DIFF[S.diffIdx].income;S.visited=[];S.eventFired=false;renderMap();document.getElementById("map-speech").textContent="День "+S.day+"! "+CHARS[S.charIdx].name+" получил ещё "+DIFF[S.diffIdx].income+"\u20BD. Кошелёк: "+S.money+"\u20BD.";show("s-map");}
+function onBkInput(){
+  var inp=document.getElementById('bk-input');var v=parseInt(inp.value,10)||0;
+  if(v<0){v=0;inp.value=0;}
+  if(v>G.money){v=G.money;inp.value=v;}
+  G.bankAmt=v;
+  document.getElementById('bk-input-left').textContent='Останется: '+R(G.money-v);
+  updateBkPrev();
+}
+function updateBkPrev(){
+  var prev=document.getElementById('bk-prev');
+  if(!G.bankAmt||G.bankAmt<=0){prev.style.display='none';return;}
+  var p=find(BANK_PRODS,function(x){return x.id===G.depProd;});
+  if(!p||p.rate===0){prev.style.display='none';return;}
+  prev.style.display='block';
+  var total=G.deposit+G.bankAmt;var rows='<b>📈 Прогноз роста:</b>';
+  for(var d=1;d<=5;d++){total=Math.floor(total*(1+p.rate));rows+='<div style="display:flex;justify-content:space-between;font-size:12px;margin-top:3px;color:#065f46"><span>Через '+d+' дн.</span><span>'+R(total)+' (+'+R(total-(G.deposit+G.bankAmt))+')</span></div>';}
+  prev.innerHTML=rows;
+}
+function doBank(){
+  var amt=G.bankAmt||0;
+  if(amt>G.money){alert('Нельзя положить больше чем есть!');return;}
+  if(amt>0){
+    var pct70=Math.floor(G.money*0.7);
+    if(amt>pct70){
+      alert('Подожди! У тебя должны оставаться деньги на обязательные покупки. Попробуй положить не больше 70% от суммы.');
+      return;
+    }
+    G.deposit+=amt;G.money-=amt;
+    if(G.depProd==='weekly')G.frozen=3;
+    G.xp+=5;G.score+=5;G.dayLog.push('🏦 Вложено '+R(amt));
+    // First day accrual
+    if(G.firstDay){
+      var pr=find(BANK_PRODS,function(x){return x.id===G.depProd;});
+      if(pr&&pr.rate>0){var acc=Math.floor(G.deposit*pr.rate);G.deposit+=acc;G.dayLog.push('💹 Проценты сразу в первый день: +'+R(acc));}
+      G.firstDay=false;
+    }
+  }
+  G._acc=false;
+  openDE();
+}
+
+/* DAY END */
+function openDE(){
+  var ch=CHARS[G.charIdx];
+  document.getElementById('de-t').textContent='Итог дня '+G.day;
+  document.getElementById('de-c').textContent=R(G.money);
+  var pct=G.deposit>=ch.dreamCost?100:Math.round(G.deposit/ch.dreamCost*100);
+  var hp=G.hp;var hpC=hpColor(hp);
+  document.getElementById('de-sp').textContent=G.day<7?'День '+G.day+' позади! Завтра новый день и новые деньги!':'Неделя завершена! Посмотрим итоги!';
+  var log=G.dayLog.length?G.dayLog.join('<br>'):'Тихий день.';G.dayLog=[];
+  var todaySkipped=G.dayConseq.length;
+  var rating=todaySkipped===0?'green':todaySkipped<=1?'orange':'red';
+  G.dayRatings.push(rating);
+  var rC={'green':'#dcfce7','orange':'#fef3c7','red':'#fee2e2'};
+  var rBr={'green':'#86efac','orange':'#fcd34d','red':'#fca5a5'};
+  var rTx={'green':'✅ Разумный день!','orange':'🟠 Средний день','red':'❌ Неразумный день'};
+  document.getElementById('de-body').innerHTML=
+    '<div style="background:'+rC[rating]+';border:2px solid '+rBr[rating]+';border-radius:12px;padding:10px 13px;margin:6px 0;font-weight:800;font-size:14px">'+rTx[rating]+'</div>'+
+    '<div class="out oi" style="font-size:12px;line-height:1.9"><b>Сегодня:</b><br>'+log+'</div>'+
+    '<div class="stats" style="margin-top:9px">'+
+    '<div class="sbox" style="background:#dbeafe"><div class="sv" style="color:#1e40af">'+R(G.money)+'</div><div class="sl" style="color:#3b82f6">Кошелёк</div></div>'+
+    '<div class="sbox" style="background:#d1fae5"><div class="sv" style="color:#065f46">'+R(G.deposit)+'</div><div class="sl" style="color:#10b981">Вклад</div></div>'+
+    '<div class="sbox" style="background:#fce7f3"><div class="sv" style="color:'+hpC+'">'+hp+'%</div><div class="sl" style="color:#ec4899">Здоровье</div></div>'+
+    '<div class="sbox" style="background:#fef3c7"><div class="sv" style="color:#92400e">'+pct+'%</div><div class="sl" style="color:#f59e0b">К мечте</div></div>'+
+    '</div>';
+  document.getElementById('de-nx').textContent=G.day>=7?'Итоги →':'День '+(G.day+1)+' →';
+  show('s-de');
+}
+function nextDay(){
+  if(G.day>=7){showFinal();return;}
+  G.day++;G.money+=DIFF[G.diffIdx].income;G._acc=false;showDS();
+}
+
+/* FINAL */
 function showFinal(){
-  var ch=CHARS[S.charIdx],sc=Math.min(100,S.score),pct=S.piggy>=ch.dreamCost?100:Math.round(S.piggy/ch.dreamCost*100);
-  document.getElementById("final-score").textContent=sc;
-  document.getElementById("final-stars").textContent=sc>=80?"⭐⭐⭐":sc>=50?"⭐⭐":"⭐";
-  document.getElementById("final-title").textContent=sc>=80?"Финансовый гений!":sc>=50?"Хороший финансист!":"Есть куда расти!";
-  document.getElementById("final-sub").textContent=ch.name+" прожил неделю. Мечта: "+ch.dream+" ("+ch.dreamCost+"\u20BD).";
-  document.getElementById("fn-wallet").textContent=S.money+"\u20BD";
-  document.getElementById("fn-piggy").textContent=S.piggy+"\u20BD";
-  document.getElementById("fn-xp").textContent=S.xp;
-  document.getElementById("fn-pct").textContent=pct+"%";
-  var tips=[pct>=100?"🎯 "+ch.name+" накопил на мечту — "+ch.dream+"!":"💡 Откладывай каждый день хотя бы 20% — и мечта станет реальностью.","🛒 Сначала нужное (еда, проезд), потом желания.","🛡 Подушка безопасности спасает при неожиданных расходах.","💼 Подработка расширяет возможности: больше зарабатываешь — больше копишь.","🎡 Случайные события всегда будут — именно поэтому важен резерв."];
-  var ul=document.getElementById("final-tips");ul.innerHTML="";
-  tips.forEach(function(t){var li=document.createElement("li");li.textContent=t;ul.appendChild(li);});
-  show("s-final");
+  var ch=CHARS[G.charIdx];var sc=clamp(G.score,0,100);
+  var pct=G.deposit>=ch.dreamCost?100:Math.round(G.deposit/ch.dreamCost*100);
+  document.getElementById('fn-sc').textContent=sc;
+  document.getElementById('fn-st').textContent=sc>=75?'⭐⭐⭐':sc>=45?'⭐⭐':'⭐';
+  document.getElementById('fn-ti').textContent=sc>=75?'Финансовый гений! 🎉':sc>=45?'Хороший финансист! 👍':'Есть куда расти! 📚';
+  document.getElementById('fn-su').textContent=ch.em+' '+ch.name+' прожил неделю! Здоровье: '+G.hp+'%';
+  document.getElementById('fn-w').textContent=R(G.money);
+  document.getElementById('fn-d').textContent=R(G.deposit);
+  document.getElementById('fn-h').textContent=G.hp+'%';
+  document.getElementById('fn-h').style.color=hpColor(G.hp);
+  document.getElementById('fn-p').textContent=pct+'%';
+  var msgs={tardy:'Саша опаздывал в школу',fainted:'Саша падал в обморок',kicked:'Саша пропускал секцию',dizzy:'Маша испытывала головокружение',thirsty:'Маша страдала от жажды',sad:'Маша грустила без книги',fail:'Лёша получал двойки',hungry:'Лёша не мог сосредоточиться',late:'Лёша опаздывал и мок под дождём'};
+  var stEl=document.getElementById('fn-story');
+  if(G.storyFlags.length){
+    var unique=[];G.storyFlags.forEach(function(f){if(!has(unique,f))unique.push(f);});
+    stEl.innerHTML='<div class="out ob"><b>Что случилось за неделю:</b><br>'+unique.map(function(f){return '• '+(msgs[f]||f);}).join('<br>')+'</div>';
+  } else {stEl.innerHTML='<div class="out og">⭐ '+ch.name+' прожил неделю без проблем! Все обязательные покупки были сделаны!</div>';}
+  var daysEl=document.getElementById('fn-days');daysEl.innerHTML='';
+  var rC={'green':'#dcfce7','orange':'#fef3c7','red':'#fee2e2'};var rBr={'green':'#10b981','orange':'#f59e0b','red':'#ef4444'};var rTx={'green':'✅','orange':'🟠','red':'❌'};
+  for(var d=0;d<7;d++){var r=G.dayRatings[d]||'green';var dot=document.createElement('div');dot.className='ddot';dot.style.cssText='background:'+rC[r]+';border-color:'+rBr[r]+';color:'+rBr[r];dot.textContent=rTx[r];daysEl.appendChild(dot);}
+  var tips=[pct>=100?'🎯 '+ch.name+' накопил на мечту - '+ch.dream+'!':'💡 Откладывай в банк каждый день - даже маленькие суммы растут.',G.hp>=80?'❤️ Отличное здоровье! Все обязательные покупки сделаны.':'❤️ Здоровье пострадало. Обязательные покупки - сначала!','🏦 Банковские проценты работают пока ты спишь - это и есть накопления!','🛒 Нужда - это то без чего нельзя. Желание - приятно, но можно обойтись.','🔒 Никогда не переходи по подозрительным ссылкам - это могут быть мошенники!'];
+  var ul=document.getElementById('fn-tips');ul.innerHTML='';
+  tips.forEach(function(t){var li=document.createElement('li');li.textContent=t;ul.appendChild(li);});
+  show('s-fin');
 }
-function resetGame(){S=freshState();for(var i=0;i<3;i++){document.getElementById("ch-"+i).classList.remove("selected");document.getElementById("df-"+i).classList.toggle("selected",i===1);}wheelAngle=0;wheelSpinning=false;drawWheel(0);show("s-intro");}
-drawWheel(0);
+
+function resetGame(){
+  G=fresh();
+  document.querySelectorAll('.cc,.dc').forEach(function(c){c.classList.remove('sel');});
+  document.getElementById('df1').classList.add('sel');
+  document.getElementById('char-info').style.display='none';
+  show('s-intro');
+}
 </script>
 </body>
+</html>
