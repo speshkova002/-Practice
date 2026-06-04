@@ -1,0 +1,250 @@
+var CHARS = [
+  {
+    em: '👦',
+    name: 'Саша', nameGen: 'Саши', nameDat: 'Саше', nameAcc: 'Сашу',
+    desc: 'Саша - спортсмен. Живет далеко от школы, поэтому в его обязательные траты входит автобус. Ходит на секцию по футболу.',
+    dream: '🎮 Игровая приставка',
+    dreamCost: 600,
+    avStyle: 'background:#dbeafe;border-color:#93c5fd',
+    needs: [
+      {
+        id: 'bus',   em: '🚌', name: 'Проездной',       cost: 25, hpLoss: 20,
+        skipMsg:   'Ты не купил проездной, поэтому Саша опоздал в школу. -20 самочувствия 😓',
+        skipStory: 'tardy'
+      },
+      {
+        id: 'lunch', em: '🍱', name: 'Обед',             cost: 40, hpLoss: 30,
+        skipMsg:   'Ты не купил обед, поэтому Саша был голодным весь день. -30 самочувствия 😤',
+        skipStory: 'hungry', isCritical: true
+      },
+      {
+        id: 'sport', em: '⚽', name: 'Взнос в секцию',  cost: 30, hpLoss: 20,
+        skipMsg:   'Ты не оплатил взнос, поэтому Саша пропустил тренировку по футболу. -20 самочувствия 😞',
+        skipStory: 'kicked'
+      }
+    ]
+  },
+
+  {
+    em: '👧',
+    name: 'Маша', nameGen: 'Маши', nameDat: 'Маше', nameAcc: 'Машу',
+    desc: 'Маша - книголюб. До школы доходит пешком, но её обязательная трата каждый день - это книга.',
+    dream: '📚 Полное собрание книг',
+    dreamCost: 500,
+    avStyle: 'background:#fce7f3;border-color:#f9a8d4',
+    needs: [
+      {
+        id: 'lunch', em: '🍱', name: 'Обед',       cost: 35, hpLoss: 30,
+        skipMsg:   'Ты не купил обед, поэтому у Маши болит голова. -30 самочувствия 😟',
+        skipStory: 'dizzy', isCritical: true
+      },
+      {
+        id: 'water', em: '💧', name: 'Вода',        cost: 10, hpLoss: 30,
+        skipMsg:   'Ты не купил воду, поэтому Маша страдала от жажды весь день. -30 самочувствия 😕',
+        skipStory: 'thirsty', isCritical: true
+      },
+      {
+        id: 'book',  em: '📗', name: 'Книга дня',   cost: 20, hpLoss: 20,
+        skipMsg:   'Ты не купил книгу, поэтому Маша весь день грустила. -20 самочувствия 📖',
+        skipStory: 'sad'
+      }
+    ]
+  },
+
+  {
+    em: '🧑',
+    name: 'Лёша', nameGen: 'Лёши', nameDat: 'Лёше', nameAcc: 'Лёшу',
+    desc: 'Леша - технарь. Его обязательные траты это интернет и автобус до школы.',
+    dream: '💻 Ноутбук',
+    dreamCost: 700,
+    avStyle: 'background:#ede9fe;border-color:#c4b5fd',
+    needs: [
+      {
+        id: 'phone', em: '📱', name: 'Интернет',    cost: 25, hpLoss: 20,
+        skipMsg:   'Ты не купил интернет, поэтому Лёша получил двойку за несданное задание. -20 самочувствия 😤',
+        skipStory: 'fail'
+      },
+      {
+        id: 'lunch', em: '🍱', name: 'Обед',         cost: 40, hpLoss: 30,
+        skipMsg:   'Ты не купил обед, поэтому Лёша был голодным и не мог думать на уроках. -30 самочувствия 😞',
+        skipStory: 'hungry', isCritical: true
+      },
+      {
+        id: 'bus',   em: '🚌', name: 'Автобус',      cost: 20, hpLoss: 20,
+        skipMsg:   'Ты не купил билет на автобус, поэтому Лёша опоздал в школу и промок под дождём. -20 самочувствия 😬',
+        skipStory: 'late'
+      }
+    ]
+  }
+];
+
+var DIFF = [
+  { label: 'Лёгкий',  income: 200 },
+  { label: 'Средний', income: 150 },
+  { label: 'Сложный', income: 120 }
+];
+
+var SHOP_WANTS = [
+  { id: 'candy',   em: '🍬', name: 'Сладкое',      cost: 20, pts: 1 },
+  { id: 'comic',   em: '📖', name: 'Комикс',        cost: 35, pts: 2 },
+  { id: 'sticker', em: '🎨', name: 'Наклейки',      cost: 25, pts: 1 },
+  { id: 'game',    em: '🕹', name: 'Игра онлайн',   cost: 45, pts: 1 }
+];
+
+var EVENTS = [
+  {
+    id: 'gift', title: '🎂 День рождения!',
+    avEm: '🦊', avBg: '#fef3c7', avBor: '#fbbf24', spBg: '#fef3c7', spC: '#92400e',
+    speech: 'У одноклассника завтра день рождения! Что подаришь?',
+    opts: [
+      { em: '🚗', t: 'Машинка (60 руб.)',          s: 'Дорогой подарок',  cost: 60, pts: 4, good: false,
+        tip: 'Друг очень рад! Но у тебя теперь мало денег на нужное. Дорогой подарок не всегда лучший выбор.' },
+      { em: '🧸', t: 'Плюшевая игрушка (35 руб.)', s: 'Хороший подарок',  cost: 35, pts: 9, good: true,
+        tip: 'Отличный выбор! Друг доволен, и ты не потратил лишнее. Средний подарок - золотая середина!' },
+      { em: '💌', t: 'Открытка своими руками',      s: 'Бесплатно',        cost:  0, pts: 2, good: false,
+        tip: 'Друг немного обиделся - ты совсем ничего не потратил. Маленький подарок лучше, чем ничего!' }
+    ]
+  },
+  {
+    id: 'rain', title: '🌧 Промокли ноги!',
+    avEm: '🦉', avBg: '#ede9fe', avBor: '#c4b5fd', spBg: '#ede9fe', spC: '#5b21b6',
+    speech: 'Промокли ноги - нужны носки. Сколько купить?',
+    opts: [
+      { em: '🧦', t: 'Одну пару (15 руб.)',   s: 'Только нужное',    cost: 15, pts: 9, good: true,
+        tip: 'Умно! Покупай ровно то, что нужно прямо сейчас.' },
+      { em: '🛍', t: 'Сразу 5 пар (75 руб.)', s: 'Много «про запас»', cost: 75, pts: 3, good: false,
+        tip: 'Запас - неплохо, но сейчас деньги нужны на обязательное.' }
+    ]
+  },
+  {
+    id: 'sale', title: '🎮 Акция в магазине!',
+    avEm: '🐱', avBg: '#fce7f3', avBor: '#f9a8d4', spBg: '#fce7f3', spC: '#9d174d',
+    speech: 'Игра за 80 руб. вместо 120! Но денег немного...',
+    opts: [
+      { em: '🛒', t: 'Взять по акции (80 руб.)', s: 'Выгодно!',         cost: 80, pts: 2, good: false,
+        tip: 'Акция - ловушка когда мало денег. Деньги ушли на желание, а не нужду!' },
+      { em: '🚶', t: 'Пройти мимо',               s: 'Сохранил деньги',  cost:  0, pts: 9, good: true,
+        tip: 'Молодец! Сначала убедись что на нужное хватит.' }
+    ]
+  },
+  {
+    id: 'tooth', title: '🦷 Болит зуб!',
+    avEm: '🦉', avBg: '#ede9fe', avBor: '#c4b5fd', spBg: '#ede9fe', spC: '#5b21b6',
+    speech: 'Заболел зуб. Врач стоит 80 руб. Если не идти - станет хуже!',
+    opts: [
+      { em: '🏥', t: 'Пойти к врачу (80 руб.)', s: 'Здоровье важнее',  cost: 80, pts: 9, good: true,
+        tip: 'Правильно! Здоровье - нужда номер один. Для таких случаев нужна подушка безопасности.' },
+      { em: '🙈', t: 'Потерпеть',                s: 'Больно, но дёшево', cost:  0, pts: 1, hpLoss: 50, good: false,
+        tip: 'Откладывать лечение опасно - самочувствие упало на 50!' }
+    ]
+  },
+  {
+    id: 'cafe', title: '🍕 Кафе с друзьями!',
+    avEm: '🦊', avBg: '#fef3c7', avBor: '#fbbf24', spBg: '#fef3c7', spC: '#92400e',
+    speech: 'Друзья зовут в кафе - 120 руб. Денег немного осталось...',
+    opts: [
+      { em: '🍕', t: 'Пойти в кафе (120 руб.)', s: 'Весело!',           cost: 120, pts: 2, good: false,
+        tip: 'Весело, но сначала убедись что на нужное хватит!' },
+      { em: '🏠', t: 'Позвать всех домой',        s: 'Бесплатно!',        cost:   0, pts: 8, good: true,
+        tip: 'Отлично! Дружба не требует денег.' }
+    ]
+  },
+  {
+    id: 'lemon', title: '🍋 Нашёл лимон!',
+    avEm: '🦊', avBg: '#fef3c7', avBor: '#fbbf24', spBg: '#fef3c7', spC: '#92400e',
+    speech: 'В магазине лимон за 15 руб.! Можно сделать лимонад и продать за 25 руб.',
+    opts: [
+      { em: '🍋', t: 'Купить лимон (15 руб.)', s: 'Сделать лимонад!',  cost: 15, pts: 9, good: true, earn: 25,
+        tip: 'Ты купил лимон за 15 руб., сделал лимонад и продал за 25 руб.! Заработал 10 руб. чистой прибыли.' },
+      { em: '🤷', t: 'Пройти мимо',             s: 'Не интересно',       cost:  0, pts: 2, good: false,
+        tip: 'Маленькие возможности для заработка упускать не стоит!' }
+    ]
+  },
+  {
+    id: 'scam', title: '📱 Подозрительное сообщение!',
+    avEm: '🦉', avBg: '#fee2e2', avBor: '#fca5a5', spBg: '#fee2e2', spC: '#991b1b',
+    speech: '«Ваша карта заблокирована! Перейдите по ссылке для разблокировки.» Что делаешь?',
+    opts: [
+      { em: '🔗', t: 'Перейти по ссылке',   s: 'Разблокировать',       cost:  0, pts: 1, scam: true, good: false,
+        tip: 'Это мошенники! Они сняли половину денег с карты. Никогда не переходи по подозрительным ссылкам!' },
+      { em: '📵', t: 'Игнорировать',          s: 'Лучше позвонить в банк', cost: 0, pts: 9, good: true,
+        tip: 'Молодец! Это была мошенническая ссылка. Если сомневаешься - звони в банк напрямую!' }
+    ]
+  }
+];
+
+var BANK_PRODS = [
+  {
+    id: 'daily',  em: '📅', name: 'Ежедневный вклад',
+    rate: 0.005, rateLabel: '0.5% в день',
+    desc: 'Небольшой доход каждый день. Снять можно в любой момент.'
+  },
+  {
+    id: 'weekly', em: '📆', name: 'Недельный вклад',
+    rate: 0.015, rateLabel: '1.5% в день',
+    desc: 'Выше доход! Деньги заморожены на 3 дня.'
+  },
+  {
+    id: 'piggy',  em: '🐷', name: 'Просто копилка',
+    rate: 0, rateLabel: '0% - без процентов',
+    desc: 'Откладываешь и хранишь. Проценты не начисляются.'
+  }
+];
+
+var CALC_TASKS = [
+  { a: 100, b: 87,  op: '-', desc: 'Покупки стоят 87 руб. Дал 100 руб. Сколько сдачи?' },
+  { a: 150, b: 63,  op: '-', desc: 'Обед стоит 63 руб. Дал 150 руб. Сколько сдачи?' },
+  { a:  25, b:  3,  op: '*', desc: 'Автобус стоит 25 руб. Едешь 3 дня. Сколько всего?' },
+  { a: 200, b:  4,  op: '/', desc: '200 руб. на 4 дня. Сколько в день?' },
+  { a: 120, b: 45,  op: '-', desc: 'Купил за 45 руб. Дал 120 руб. Сдача?' }
+];
+
+var GROCERY_LISTS = [
+  {
+    charName: 'Саша', budget: 200,
+    momList: [
+      { id: 'bread',  em: '🍞', name: 'Хлеб',     cost: 30, isForMom: true },
+      { id: 'milk',   em: '🥛', name: 'Молоко',    cost: 45, isForMom: true },
+      { id: 'eggs',   em: '🥚', name: 'Яйца',      cost: 70, isForMom: true },
+      { id: 'pasta',  em: '🍝', name: 'Макароны',  cost: 35, isForMom: true }
+    ],
+    extraItems: [
+      { id: 'chips',  em: '🍟', name: 'Чипсы',       cost: 55, isForMom: false },
+      { id: 'soda',   em: '🥤', name: 'Газировка',   cost: 40, isForMom: false },
+      { id: 'cookie', em: '🍪', name: 'Печенье',     cost: 35, isForMom: false },
+      { id: 'icecr',  em: '🍦', name: 'Мороженое',   cost: 60, isForMom: false }
+    ]
+  },
+  {
+    charName: 'Маша', budget: 180,
+    momList: [
+      { id: 'bread',  em: '🍞', name: 'Хлеб',     cost: 30, isForMom: true },
+      { id: 'cheese', em: '🧀', name: 'Сыр',       cost: 65, isForMom: true },
+      { id: 'yogurt', em: '🫙', name: 'Йогурт',    cost: 40, isForMom: true },
+      { id: 'apples', em: '🍎', name: 'Яблоки',    cost: 50, isForMom: true }
+    ],
+    extraItems: [
+      { id: 'chips',  em: '🍟', name: 'Чипсы',       cost: 55, isForMom: false },
+      { id: 'juice',  em: '🧃', name: 'Сок',          cost: 45, isForMom: false },
+      { id: 'cookie', em: '🍪', name: 'Печенье',     cost: 35, isForMom: false },
+      { id: 'candy',  em: '🍬', name: 'Конфеты',     cost: 30, isForMom: false }
+    ]
+  },
+  {
+    charName: 'Лёша', budget: 190,
+    momList: [
+      { id: 'bread',  em: '🍞', name: 'Хлеб',     cost: 30, isForMom: true },
+      { id: 'milk',   em: '🥛', name: 'Молоко',    cost: 45, isForMom: true },
+      { id: 'butter', em: '🧈', name: 'Масло',     cost: 55, isForMom: true },
+      { id: 'potato', em: '🥔', name: 'Картошка',  cost: 40, isForMom: true }
+    ],
+    extraItems: [
+      { id: 'chips',  em: '🍟', name: 'Чипсы',       cost: 55, isForMom: false },
+      { id: 'soda',   em: '🥤', name: 'Газировка',   cost: 40, isForMom: false },
+      { id: 'snack',  em: '🥜', name: 'Орешки',      cost: 45, isForMom: false },
+      { id: 'icecr',  em: '🍦', name: 'Мороженое',   cost: 60, isForMom: false }
+    ]
+  }
+];
+
+var MINI_TYPES = ['sort', 'budget', 'calc', 'chain', 'catch', 'grocery'];
