@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Бюджетный марафон</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <div id="s-intro" class="sc on">
+    <div class="hdr hdr-intro">
+      <span class="hdr-t">Финансовая игра</span>
+    </div>
+    <div class="bd">
+      <div class="title-banner">
+        <h1>«Бюджетный марафон: неделя с умом» 🏆</h1>
+      </div>
+      <div class="brow">
+        <div class="av" style="background:#fef3c7;border-color:#fbbf24">🦊</div>
+        <div class="sp" style="background:#fef3c7;color:#92400e">
+          Привет! Я Феня. Выбери персонажа и помоги ему в течение недели
+          распределять деньги и накопить на мечту! 🎯
+        </div>
+      </div>
+      <div class="slbl">👤 Выбери персонажа</div>
+      <div class="cg">
+        <div class="cc" id="ch0" onclick="pickChar(0)">
+          <div style="font-size:32px">👦</div>
+          <div style="font-size:13px;font-weight:800;color:#4c1d95;margin-top:5px">Саша</div>
+          <div style="font-size:11px;color:#7c3aed;font-weight:700">Спортсмен 🏃</div>
+        </div>
+        <div class="cc" id="ch1" onclick="pickChar(1)">
+          <div style="font-size:32px">👧</div>
+          <div style="font-size:13px;font-weight:800;color:#4c1d95;margin-top:5px">Маша</div>
+          <div style="font-size:11px;color:#7c3aed;font-weight:700">Книголюб 📚</div>
+        </div>
+        <div class="cc" id="ch2" onclick="pickChar(2)">
+          <div style="font-size:32px">🧑</div>
+          <div style="font-size:13px;font-weight:800;color:#4c1d95;margin-top:5px">Лёша</div>
+          <div style="font-size:11px;color:#7c3aed;font-weight:700">Технарь 💻</div>
+        </div>
+      </div>
+      <div id="char-info" style="display:none"></div>
+      <div class="slbl">⚡ Сложность</div>
+      <div class="dg">
+        <div class="dc" id="df0" onclick="pickDiff(0)">
+          <div style="font-size:22px">🐣</div>
+          <div style="font-size:12px;font-weight:800;margin-top:3px;color:#166534">Лёгкий</div>
+          <div style="font-size:10px;color:#6b7280;font-weight:600">200 руб. в день</div>
+        </div>
+        <div class="dc sel" id="df1" onclick="pickDiff(1)">
+          <div style="font-size:22px">🦊</div>
+          <div style="font-size:12px;font-weight:800;margin-top:3px;color:#92400e">Средний</div>
+          <div style="font-size:10px;color:#6b7280;font-weight:600">150 руб. в день</div>
+        </div>
+        <div class="dc" id="df2" onclick="pickDiff(2)">
+          <div style="font-size:22px">🦁</div>
+          <div style="font-size:12px;font-weight:800;margin-top:3px;color:#991b1b">Сложный</div>
+          <div style="font-size:10px;color:#6b7280;font-weight:600">120 руб. в день</div>
+        </div>
+      </div>
+      <div class="brow2">
+        <button class="btn p" onclick="startGame()">Начать игру! 🚀</button>
+      </div>
+    </div>
+  </div>
+  <div id="s-ds" class="sc">
+    <div class="hdr hdr-day">
+      <span class="hdr-t" id="ds-t">День 1</span>
+      <div class="hdr-r">
+        <div class="pill">💰 <span id="ds-c">0 руб.</span></div>
+        <div class="pill" id="ds-hp-pill">❤️ 100%</div>
+        <div class="pill">⭐ <span id="ds-x">0</span></div>
+      </div>
+    </div>
+    <div class="bd">
+      <div class="brow">
+        <div class="av" id="ds-av" style="background:#fef3c7;border-color:#fbbf24">🦊</div>
+        <div class="sp" id="ds-sp"></div>
+      </div>
+      <div id="ds-con"></div>
+      <div id="ds-int"></div>
+      <div id="ds-dream"></div>
+      <div id="ds-obl"></div>
+      <div id="ds-flow"></div>
+      <div class="brow2">
+        <button class="btn p" onclick="goShop()">Идём в магазин 🛒</button>
+      </div>
+    </div>
+  </div>
+  <div id="s-shop" class="sc">
+    <div class="hdr hdr-shop">
+      <span class="hdr-t">🛒 Магазин «Всё есть»</span>
+      <div class="hdr-r">
+        <div class="pill">💰 <span id="sh-c">0 руб.</span></div>
+        <div class="pill" id="sh-hp-pill">❤️ 100%</div>
+      </div>
+    </div>
+    <div class="bd">
+      <div class="brow">
+        <div class="av" style="background:#fce7f3;border-color:#f9a8d4">🐱</div>
+        <div class="sp" style="background:#fce7f3;color:#9d174d">
+          Выбирай, что купить с умом!
+        </div>
+      </div>
+      <div id="sh-list"></div>
+      <div class="out oy" id="sh-bag" style="display:none">
+        🛍 <span id="sh-bag-e"></span>
+        - Итого: <b id="sh-bag-t">0 руб.</b>
+        - Остаток: <b id="sh-bag-l">0 руб.</b>
+      </div>
+      <div class="brow2">
+        <button class="btn g" onclick="doCheckout()">Оплатить ✓</button>
+      </div>
+    </div>
+  </div>
+  <div id="s-work" class="sc">
+    <div class="hdr hdr-work">
+      <span class="hdr-t">💼 Подработка у Сыча</span>
+      <div class="hdr-r">
+        <div class="pill">💰 <span id="wk-c">0 руб.</span></div>
+      </div>
+    </div>
+    <div class="bd">
+      <div class="brow">
+        <div class="av" style="background:#ede9fe;border-color:#c4b5fd">🦉</div>
+        <div class="sp" id="wk-sp" style="background:#ede9fe;color:#5b21b6"></div>
+      </div>
+      <div id="wk-body"></div>
+      <div class="brow2" id="wk-btns"></div>
+    </div>
+  </div>
+  <div id="s-ev" class="sc">
+    <div class="hdr hdr-ev">
+      <span class="hdr-t" id="ev-t">Событие!</span>
+      <div class="hdr-r">
+        <div class="pill">💰 <span id="ev-c">0 руб.</span></div>
+        <div class="pill" id="ev-hp-pill">❤️ 100%</div>
+      </div>
+    </div>
+    <div class="bd">
+      <div class="brow">
+        <div class="av" id="ev-av">🦊</div>
+        <div class="sp" id="ev-sp"></div>
+      </div>
+      <div id="ev-ch"></div>
+      <div id="ev-res"></div>
+      <div class="brow2">
+        <button class="btn p" id="ev-nx" style="display:none" onclick="afterEv()">
+          Продолжить →
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="s-bank" class="sc">
+    <div class="hdr hdr-bank">
+      <span class="hdr-t">🏦 Банк «Копейка»</span>
+      <div class="hdr-r">
+        <div class="pill">💰 <span id="bk-c">0 руб.</span></div>
+        <div class="pill" id="bk-hp-pill">❤️ 100%</div>
+      </div>
+    </div>
+    <div class="bd">
+      <div class="brow">
+        <div class="av" style="background:#d1fae5;border-color:#6ee7b7">🦉</div>
+        <div class="sp" style="background:#d1fae5;color:#065f46">
+          Вклад приносит проценты каждый день! Чем дольше держишь - тем больше зарабатываешь.
+        </div>
+      </div>
+      <div class="stats" style="grid-template-columns:1fr 1fr">
+        <div class="sbox" style="background:#dbeafe">
+          <div class="sv" id="bk-w" style="color:#1e40af">0 руб.</div>
+          <div class="sl" style="color:#3b82f6">Кошелёк</div>
+        </div>
+        <div class="sbox" style="background:#d1fae5">
+          <div class="sv" id="bk-d" style="color:#065f46">0 руб.</div>
+          <div class="sl" style="color:#10b981">На вкладе</div>
+        </div>
+      </div>
+      <div id="bk-dream2" style="margin:8px 0"></div>
+      <div style="margin:8px 0">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:#6b7280;margin-bottom:3px;font-weight:700">
+          <span id="bk-dl">К мечте</span>
+          <span id="bk-dp">0%</span>
+        </div>
+        <div class="pb-w"><div class="pb" id="bk-pb" style="width:0%"></div></div>
+        <div style="font-size:11px;color:#9ca3af;text-align:right;font-weight:600" id="bk-dv"></div>
+      </div>
+      <div class="slbl">🏦 Тип вклада</div>
+      <div id="bk-prods"></div>
+      <div class="slbl">💰 Сколько положить?</div>
+      <div style="display:flex;gap:8px;align-items:center;margin:8px 0">
+        <input class="inp" type="number" id="bk-input"
+               placeholder="Введи сумму (руб.)" min="0" oninput="onBkInput()">
+        <span id="bk-input-left"
+              style="font-size:12px;color:#9ca3af;white-space:nowrap;font-weight:600"></span>
+      </div>
+      <div id="bk-prev"
+           style="display:none;background:#d1fae5;border-radius:12px;padding:10px 13px;margin:8px 0;font-size:13px;color:#065f46;font-weight:600">
+      </div>
+      <div class="brow2">
+        <button class="btn g" onclick="doBank()">Подтвердить 💰</button>
+      </div>
+    </div>
+  </div>
+  <div id="s-over" class="sc">
+    <div class="hdr" style="background:linear-gradient(135deg,#ef4444,#dc2626)">
+      <span class="hdr-t">Игра окончена</span>
+    </div>
+    <div class="bd" style="text-align:center;padding:30px 20px">
+      <div style="font-size:64px;margin-bottom:12px">😴</div>
+      <div style="font-size:18px;font-weight:800;color:#991b1b;margin-bottom:8px"
+           id="over-title">Нужен отдых!</div>
+      <div style="font-size:14px;color:#7f1d1d;margin-bottom:20px;line-height:1.6;font-weight:600"
+           id="over-msg"></div>
+      <button class="btn p" onclick="resetGame()">Попробовать снова 🔄</button>
+    </div>
+  </div>
+  <div id="s-de" class="sc">
+    <div class="hdr hdr-day">
+      <span class="hdr-t" id="de-t">Итог дня</span>
+      <div class="hdr-r">
+        <div class="pill">💰 <span id="de-c">0 руб.</span></div>
+      </div>
+    </div>
+    <div class="bd">
+      <div class="brow">
+        <div class="av" style="background:#fef3c7;border-color:#fbbf24">🦊</div>
+        <div class="sp" id="de-sp" style="background:#fef3c7;color:#92400e"></div>
+      </div>
+      <div id="de-body"></div>
+      <div class="brow2">
+        <button class="btn p" id="de-nx" onclick="nextDay()">Дальше →</button>
+      </div>
+    </div>
+  </div>
+  <div id="s-fin" class="sc">
+    <div class="hdr hdr-fin">
+      <span class="hdr-t">🏆 Итоги недели!</span>
+    </div>
+    <div class="bd">
+      <div style="text-align:center;padding:10px 0 6px">
+        <div class="fin-ring">
+          <span style="font-size:26px;font-weight:900;color:#065f46" id="fn-sc">0</span>
+          <span style="font-size:11px;color:#6b7280;font-weight:700">из 100</span>
+        </div>
+        <div style="font-size:26px;margin:4px 0" id="fn-st">⭐</div>
+        <div style="font-size:16px;font-weight:900;color:#1e1b4b;margin-bottom:3px" id="fn-ti"></div>
+        <div style="font-size:12px;color:#6b7280;margin-bottom:10px;font-weight:600" id="fn-su"></div>
+        <div class="stats">
+          <div class="sbox" style="background:#dbeafe">
+            <div class="sv" style="color:#1e40af" id="fn-w">0 руб.</div>
+            <div class="sl" style="color:#3b82f6">Кошелёк</div>
+          </div>
+          <div class="sbox" style="background:#d1fae5">
+            <div class="sv" style="color:#065f46" id="fn-d">0 руб.</div>
+            <div class="sl" style="color:#10b981">Вклад</div>
+          </div>
+          <div class="sbox" style="background:#fce7f3">
+            <div class="sv" id="fn-h" style="color:#be185d">100%</div>
+            <div class="sl" style="color:#ec4899">Здоровье</div>
+          </div>
+          <div class="sbox" style="background:#fef3c7">
+            <div class="sv" id="fn-p" style="color:#92400e">0%</div>
+            <div class="sl" style="color:#f59e0b">К мечте</div>
+          </div>
+        </div>
+      </div>
+      <div id="fn-story" style="margin:8px 0"></div>
+      <div id="fn-days"
+           style="display:flex;gap:4px;justify-content:center;margin:10px 0;flex-wrap:wrap">
+      </div>
+      <ul class="tip-ul" id="fn-tips"></ul>
+      <div class="brow2" style="justify-content:center">
+        <button class="btn p" onclick="resetGame()">Играть снова 🎮</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
